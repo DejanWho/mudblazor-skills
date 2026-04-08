@@ -7,7 +7,7 @@ import json
 import re
 from pathlib import Path
 
-ROOT = Path("/Users/dejanwho/Projects/Code/mudblazor-skills")
+ROOT = Path("/Users/dejanwho/Projects/Code/mudblazor-skills/skills")
 
 
 def read_all(output_dir: Path) -> str:

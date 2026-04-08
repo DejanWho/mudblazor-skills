@@ -1,0 +1,18 @@
+# Claude Code local state (user-specific permissions, session files)
+.claude/
+
+# Python caches from scripts/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# macOS
+.DS_Store
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+
+# Node (in case Copilot or docs tooling gets added later)
+node_modules/

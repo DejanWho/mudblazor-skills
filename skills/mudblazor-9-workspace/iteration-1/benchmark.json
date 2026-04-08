@@ -1,10 +1,10 @@
 {
   "metadata": {
     "skill_name": "mudblazor-9",
-    "skill_path": "/Users/dejanwho/Projects/Code/mudblazor-skills/mudblazor-9",
+    "skill_path": "/Users/dejanwho/Projects/Code/mudblazor-skills/skills/mudblazor-9",
     "executor_model": "claude-opus-4-6",
     "analyzer_model": "claude-opus-4-6",
-    "timestamp": "2026-04-08T09:12:43Z",
+    "timestamp": "2026-04-08T10:06:21Z",
     "evals_run": [
       1,
       2,

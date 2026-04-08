@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from statistics import mean, stdev
 
-ROOT = Path("/Users/dejanwho/Projects/Code/mudblazor-skills")
+ROOT = Path("/Users/dejanwho/Projects/Code/mudblazor-skills/skills")
 
 
 def fix_grading_json(run_dir: Path, eval_name: str, condition: str):
