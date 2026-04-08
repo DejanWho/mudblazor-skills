@@ -1,0 +1,35 @@
+{
+  "eval_id": 2,
+  "eval_name": "dialog-async-and-menu-context",
+  "prompt": "I bumped MudBlazor from 8.11.0 to 9.3.0 in my Blazor Server project's .csproj. Now my Pages/UserList.razor file at /Users/dejanwho/Projects/Code/mudblazor-skills/mudblazor-migration-8-to-9/evals/fixtures/eval-2-dialog-and-async/UserList.razor doesn't build. The build errors are about IDialogService.Show, ShowMessageBox, IDataGrid.ServerData signature, and the MudMenu activator content. Please update the file to compile and behave correctly against MudBlazor 9.",
+  "assertions": [
+    {
+      "id": "no-sync-show",
+      "text": "UserList.razor no longer calls DialogService.Show<...>(...) (the synchronous v8 method)"
+    },
+    {
+      "id": "uses-show-async",
+      "text": "UserList.razor uses await DialogService.ShowAsync<...>(...) for opening dialogs"
+    },
+    {
+      "id": "uses-show-message-box-async",
+      "text": "UserList.razor uses ShowMessageBoxAsync (not the removed sync ShowMessageBox)"
+    },
+    {
+      "id": "server-data-takes-cancellation-token",
+      "text": "The LoadServerDataAsync method signature now accepts a CancellationToken as the second parameter"
+    },
+    {
+      "id": "menu-uses-context-toggle",
+      "text": "The MudMenu's ActivatorContent button wires OnClick to @context.ToggleAsync (or context.OpenAsync) — the v9 explicit activation pattern"
+    },
+    {
+      "id": "preserves-route",
+      "text": "UserList.razor preserves the @page \"/users\" route"
+    },
+    {
+      "id": "preserves-grid-columns",
+      "text": "UserList.razor preserves all four columns (Id, Name, Email, Actions) from the original"
+    }
+  ]
+}

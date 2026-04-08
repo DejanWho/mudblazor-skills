@@ -1,0 +1,47 @@
+{
+  "eval_id": 1,
+  "eval_name": "orders-page-with-server-datagrid",
+  "prompt": "Build a /orders page with MudDataGrid using ServerData (with cancellation token), sortable columns (OrderId, CustomerName, Total $-formatted, CreatedAt yyyy-MM-dd), debounced search (300ms) by customer name, pagination (10/25/50/100), and a per-row View button that opens a confirmation dialog showing the order ID.",
+  "assertions": [
+    {
+      "id": "has-page-directive",
+      "text": "Orders.razor declares @page \"/orders\""
+    },
+    {
+      "id": "has-render-mode",
+      "text": "Orders.razor declares @rendermode InteractiveServer (or similar interactive render mode)"
+    },
+    {
+      "id": "uses-mud-data-grid-typed",
+      "text": "Orders.razor uses MudDataGrid<Order> (typed) with T explicitly set or inferred"
+    },
+    {
+      "id": "uses-server-data-with-cancellation",
+      "text": "The ServerData delegate accepts a CancellationToken (the v9 signature) and ideally passes it through to OrderService.QueryAsync"
+    },
+    {
+      "id": "has-debounced-search",
+      "text": "The toolbar contains a search MudTextField with DebounceInterval=\"300\" (or 300ms equivalent) wired to ReloadServerData on debounce"
+    },
+    {
+      "id": "has-property-columns-formatted",
+      "text": "The grid has PropertyColumns for OrderId, CustomerName, Total (with currency Format), and CreatedAt (with yyyy-MM-dd Format)"
+    },
+    {
+      "id": "has-pager-with-page-sizes",
+      "text": "The grid has a MudDataGridPager with PageSizeOptions including 10, 25, 50, 100"
+    },
+    {
+      "id": "has-view-action-column",
+      "text": "The grid has a TemplateColumn (or action column) with a per-row View button that opens a dialog"
+    },
+    {
+      "id": "uses-show-async",
+      "text": "Dialog opening uses await DialogService.ShowAsync (the v9 async API), not Show"
+    },
+    {
+      "id": "dialog-component-exists",
+      "text": "A separate dialog .razor component is created (or an inline dialog used) that displays the order ID"
+    }
+  ]
+}

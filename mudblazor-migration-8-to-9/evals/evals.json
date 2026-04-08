@@ -1,0 +1,50 @@
+{
+  "skill_name": "mudblazor-migration-8-to-9",
+  "evals": [
+    {
+      "id": 1,
+      "name": "mudchart-v9-migration",
+      "prompt": "I'm upgrading my Blazor Server app from MudBlazor 8 to MudBlazor 9. The file at fixtures/eval-1-chart/Dashboard.razor uses MudChart with the v8 API (InputData / XAxisLabels / MudTimeSeriesChart). Please update it to use the v9 chart API so it builds against MudBlazor 9.3.0.",
+      "files": ["fixtures/eval-1-chart/Dashboard.razor"],
+      "assertions": [
+        {"id": "no-input-data", "text": "Dashboard.razor no longer uses the v8 'InputData' parameter on MudChart"},
+        {"id": "no-x-axis-labels", "text": "Dashboard.razor no longer uses the v8 'XAxisLabels' parameter (uses ChartLabels instead)"},
+        {"id": "no-input-labels", "text": "Dashboard.razor no longer uses the v8 'InputLabels' parameter (uses ChartLabels instead)"},
+        {"id": "no-mud-time-series-chart", "text": "Dashboard.razor no longer uses the removed <MudTimeSeriesChart> component"},
+        {"id": "uses-chart-series-typed", "text": "Dashboard.razor uses the typed ChartSeries<T> generic for chart data"},
+        {"id": "uses-bar-chart-options", "text": "Dashboard.razor uses BarChartOptions (or similar type-specific options class)"},
+        {"id": "uses-as-chart-data-set", "text": "Dashboard.razor wraps chart data with .AsChartDataSet() (the v9 helper)"},
+        {"id": "preserves-page-directive", "text": "Dashboard.razor preserves the @page \"/dashboard\" route"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "dialog-async-and-menu-context",
+      "prompt": "I bumped MudBlazor from 8.11.0 to 9.3.0 in my Blazor Server project. Now my Pages/UserList.razor file at fixtures/eval-2-dialog-and-async/UserList.razor doesn't build. Errors are about IDialogService.Show, ShowMessageBox, IDataGrid.ServerData signature, and the MudMenu activator. Please fix it for MudBlazor 9.",
+      "files": ["fixtures/eval-2-dialog-and-async/UserList.razor"],
+      "assertions": [
+        {"id": "no-sync-show", "text": "UserList.razor no longer calls DialogService.Show<...>(...) (synchronous v8 method)"},
+        {"id": "uses-show-async", "text": "UserList.razor uses await DialogService.ShowAsync<...>(...)"},
+        {"id": "uses-show-message-box-async", "text": "UserList.razor uses ShowMessageBoxAsync"},
+        {"id": "server-data-takes-cancellation-token", "text": "LoadServerDataAsync accepts CancellationToken as second parameter"},
+        {"id": "menu-uses-context-toggle", "text": "MudMenu's ActivatorContent button wires OnClick to @context.ToggleAsync"},
+        {"id": "preserves-route", "text": "UserList.razor preserves the @page \"/users\" route"},
+        {"id": "preserves-grid-columns", "text": "UserList.razor preserves all four grid columns"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "custom-form-component-converter",
+      "prompt": "After upgrading to MudBlazor 9, my custom MudFormComponent fails to compile with errors about GetDefaultConverter, WriteValueAsync, and a missing constructor overload. The file is at fixtures/eval-3-custom-form-component/TagsInput.razor.cs. Please fix it for MudBlazor 9 while preserving its behavior.",
+      "files": ["fixtures/eval-3-custom-form-component/TagsInput.razor.cs"],
+      "assertions": [
+        {"id": "overrides-get-default-converter", "text": "TagsInput.razor.cs overrides GetDefaultConverter() (the abstract method new in v9)"},
+        {"id": "no-write-value-async", "text": "TagsInput.razor.cs no longer overrides WriteValueAsync"},
+        {"id": "uses-set-value-core-async", "text": "TagsInput.razor.cs overrides SetValueCoreAsync"},
+        {"id": "no-base-converter-call", "text": "TagsInput.razor.cs constructor no longer passes a Converter to base()"},
+        {"id": "uses-validate-async", "text": "Validate() override is renamed to ValidateAsync()"},
+        {"id": "preserves-tags-parsing-behavior", "text": "Preserves comma-split + trim tag parsing behavior"}
+      ]
+    }
+  ]
+}

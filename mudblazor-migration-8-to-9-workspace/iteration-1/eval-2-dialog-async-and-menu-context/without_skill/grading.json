@@ -1,0 +1,52 @@
+{
+  "summary": {
+    "passed": 5,
+    "failed": 2,
+    "total": 7,
+    "pass_rate": 0.7142857142857143
+  },
+  "expectations": [
+    {
+      "id": "no-sync-show",
+      "text": "UserList.razor no longer calls DialogService.Show<...>(...) (synchronous v8 method)",
+      "passed": true,
+      "evidence": "confirmed absent: DialogService\\.Show<[^>]+>\\("
+    },
+    {
+      "id": "uses-show-async",
+      "text": "UserList.razor uses await DialogService.ShowAsync<...>(...)",
+      "passed": true,
+      "evidence": "DialogService.ShowAsync<"
+    },
+    {
+      "id": "uses-show-message-box-async",
+      "text": "UserList.razor uses ShowMessageBoxAsync",
+      "passed": false,
+      "evidence": "pattern not found: ShowMessageBoxAsync"
+    },
+    {
+      "id": "server-data-takes-cancellation-token",
+      "text": "LoadServerDataAsync accepts CancellationToken as second parameter",
+      "passed": true,
+      "evidence": "LoadServerDataAsync(GridState<User> state, CancellationToken cancellationToken"
+    },
+    {
+      "id": "menu-uses-context-toggle",
+      "text": "MudMenu's ActivatorContent button wires OnClick to @context.ToggleAsync",
+      "passed": false,
+      "evidence": "pattern not found: context\\.(?:ToggleAsync|OpenAsync)"
+    },
+    {
+      "id": "preserves-route",
+      "text": "UserList.razor preserves the @page \"/users\" route",
+      "passed": true,
+      "evidence": "@page \"/users\""
+    },
+    {
+      "id": "preserves-grid-columns",
+      "text": "UserList.razor preserves all four grid columns",
+      "passed": true,
+      "evidence": "Property=\"x => x.Id\" | Property=\"x => x.Email\""
+    }
+  ]
+}

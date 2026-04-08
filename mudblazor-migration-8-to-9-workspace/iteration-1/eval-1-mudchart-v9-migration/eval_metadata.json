@@ -1,0 +1,39 @@
+{
+  "eval_id": 1,
+  "eval_name": "mudchart-v9-migration",
+  "prompt": "I'm upgrading my Blazor Server app from MudBlazor 8 to MudBlazor 9. The file at /Users/dejanwho/Projects/Code/mudblazor-skills/mudblazor-migration-8-to-9/evals/fixtures/eval-1-chart/Dashboard.razor uses MudChart with the v8 API (InputData / XAxisLabels / MudTimeSeriesChart). Please update it to use the v9 chart API so it builds against MudBlazor 9.3.0.",
+  "assertions": [
+    {
+      "id": "no-input-data",
+      "text": "Dashboard.razor no longer uses the v8 'InputData' parameter on MudChart"
+    },
+    {
+      "id": "no-x-axis-labels",
+      "text": "Dashboard.razor no longer uses the v8 'XAxisLabels' parameter (uses ChartLabels instead)"
+    },
+    {
+      "id": "no-input-labels",
+      "text": "Dashboard.razor no longer uses the v8 'InputLabels' parameter (uses ChartLabels instead)"
+    },
+    {
+      "id": "no-mud-time-series-chart",
+      "text": "Dashboard.razor no longer uses the removed <MudTimeSeriesChart> component (uses MudChart with ChartType.TimeSeries)"
+    },
+    {
+      "id": "uses-chart-series-typed",
+      "text": "Dashboard.razor uses the typed ChartSeries<T> generic for chart data (e.g., ChartSeries<double>)"
+    },
+    {
+      "id": "uses-bar-chart-options",
+      "text": "Dashboard.razor uses BarChartOptions (or similar type-specific options class) instead of the old generic ChartOptions for the bar chart"
+    },
+    {
+      "id": "uses-as-chart-data-set",
+      "text": "Dashboard.razor wraps chart data with .AsChartDataSet() (the v9 helper for converting arrays to ChartDataSet)"
+    },
+    {
+      "id": "preserves-page-directive",
+      "text": "Dashboard.razor preserves the @page \"/dashboard\" route from the original file"
+    }
+  ]
+}

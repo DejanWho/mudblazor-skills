@@ -1,0 +1,14 @@
+{
+  "eval-1-mudchart-v9-migration": {
+    "with_skill": "a4de74269b6d0d45c",
+    "without_skill": "aebd60d72eb4beac4"
+  },
+  "eval-2-dialog-async-and-menu-context": {
+    "with_skill": "a1bf5bda71c49f93e",
+    "without_skill": "ae472b123ae0b18de"
+  },
+  "eval-3-custom-form-component-converter": {
+    "with_skill": "ab89a7c1f4e6baa3c",
+    "without_skill": "a200a94f8bcc92e47"
+  }
+}

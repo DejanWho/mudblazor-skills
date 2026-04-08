@@ -1,0 +1,94 @@
+{
+  "summary": {
+    "passed": 13,
+    "failed": 1,
+    "total": 14,
+    "pass_rate": 0.9285714285714286
+  },
+  "expectations": [
+    {
+      "id": "has-mud-theme-provider",
+      "text": "Includes <MudThemeProvider> with Theme bound",
+      "passed": true,
+      "evidence": "<MudThemeProvider @ref=\"_mudThemeProvider\" Theme="
+    },
+    {
+      "id": "has-mud-popover-provider",
+      "text": "Includes <MudPopoverProvider />",
+      "passed": true,
+      "evidence": "<MudPopoverProvider />"
+    },
+    {
+      "id": "has-mud-dialog-provider",
+      "text": "Includes <MudDialogProvider />",
+      "passed": true,
+      "evidence": "<MudDialogProvider"
+    },
+    {
+      "id": "has-mud-snackbar-provider",
+      "text": "Includes <MudSnackbarProvider />",
+      "passed": true,
+      "evidence": "<MudSnackbarProvider />"
+    },
+    {
+      "id": "popover-before-dialog",
+      "text": "MudPopoverProvider appears BEFORE MudDialogProvider",
+      "passed": true,
+      "evidence": "Popover idx=140, Dialog idx=163"
+    },
+    {
+      "id": "theme-has-primary-color",
+      "text": "Custom theme sets Primary = \"#0EA5E9\"",
+      "passed": true,
+      "evidence": "Primary = \"#0EA5E9\""
+    },
+    {
+      "id": "theme-has-secondary-color",
+      "text": "Custom theme sets Secondary = \"#64748B\"",
+      "passed": true,
+      "evidence": "Secondary = \"#64748B\""
+    },
+    {
+      "id": "theme-has-border-radius",
+      "text": "Theme sets LayoutProperties.DefaultBorderRadius = \"8px\"",
+      "passed": true,
+      "evidence": "DefaultBorderRadius = \"8px\""
+    },
+    {
+      "id": "theme-has-drawer-width",
+      "text": "Theme sets LayoutProperties.DrawerWidthLeft = \"280px\"",
+      "passed": true,
+      "evidence": "DrawerWidthLeft = \"280px\""
+    },
+    {
+      "id": "follows-os-dark-mode",
+      "text": "Calls GetSystemDarkModeAsync() (v9 method)",
+      "passed": false,
+      "evidence": "pattern not found: GetSystemDarkModeAsync"
+    },
+    {
+      "id": "has-toggle-button",
+      "text": "AppBar has MudIconButton with sun/moon icons",
+      "passed": true,
+      "evidence": "MudIconButton | DarkMode"
+    },
+    {
+      "id": "uses-localstorage-via-jsinterop",
+      "text": "Toggle handler persists to localStorage via IJSRuntime",
+      "passed": true,
+      "evidence": "localStorage.getItem"
+    },
+    {
+      "id": "preserves-app-name",
+      "text": "Preserves 'Acme Dashboard' in the AppBar",
+      "passed": true,
+      "evidence": "Acme Dashboard"
+    },
+    {
+      "id": "preserves-nav-links",
+      "text": "Preserves Home/Users/Settings NavLinks",
+      "passed": true,
+      "evidence": "Href=\"/users\" | Href=\"/settings\""
+    }
+  ]
+}

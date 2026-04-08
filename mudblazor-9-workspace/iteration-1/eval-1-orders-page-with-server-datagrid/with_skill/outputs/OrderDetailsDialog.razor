@@ -1,0 +1,34 @@
+@* Confirmation dialog shown when the user clicks the "View" button on an order row. *@
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.body1">
+                Are you sure you want to view the details for this order?
+            </MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                Order ID: <b>@OrderId</b>
+            </MudText>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   OnClick="Confirm">
+            Confirm
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public int OrderId { get; set; }
+
+    private void Confirm() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+}

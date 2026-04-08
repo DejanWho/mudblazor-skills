@@ -1,0 +1,58 @@
+{
+  "summary": {
+    "passed": 3,
+    "failed": 5,
+    "total": 8,
+    "pass_rate": 0.375
+  },
+  "expectations": [
+    {
+      "id": "no-input-data",
+      "text": "Dashboard.razor no longer uses the v8 'InputData' parameter on MudChart",
+      "passed": true,
+      "evidence": "confirmed absent: InputData\\s*="
+    },
+    {
+      "id": "no-x-axis-labels",
+      "text": "Dashboard.razor no longer uses the v8 'XAxisLabels' parameter",
+      "passed": false,
+      "evidence": "unwanted pattern found: XAxisLabels="
+    },
+    {
+      "id": "no-input-labels",
+      "text": "Dashboard.razor no longer uses the v8 'InputLabels' parameter",
+      "passed": true,
+      "evidence": "confirmed absent: InputLabels\\s*="
+    },
+    {
+      "id": "no-mud-time-series-chart",
+      "text": "Dashboard.razor no longer uses the removed <MudTimeSeriesChart> component",
+      "passed": false,
+      "evidence": "unwanted pattern found: <MudTimeSeriesChart"
+    },
+    {
+      "id": "uses-chart-series-typed",
+      "text": "Dashboard.razor uses the typed ChartSeries<T> generic for chart data",
+      "passed": false,
+      "evidence": "pattern not found: ChartSeries<\\w+>"
+    },
+    {
+      "id": "uses-bar-chart-options",
+      "text": "Dashboard.razor uses BarChartOptions (or similar type-specific options class)",
+      "passed": false,
+      "evidence": "pattern not found: BarChartOptions|LineChartOptions|DonutChartOptions|PieChartOptions"
+    },
+    {
+      "id": "uses-as-chart-data-set",
+      "text": "Dashboard.razor wraps chart data with .AsChartDataSet()",
+      "passed": false,
+      "evidence": "pattern not found: \\.AsChartDataSet\\(\\)"
+    },
+    {
+      "id": "preserves-page-directive",
+      "text": "Dashboard.razor preserves the @page \"/dashboard\" route",
+      "passed": true,
+      "evidence": "@page \"/dashboard\""
+    }
+  ]
+}

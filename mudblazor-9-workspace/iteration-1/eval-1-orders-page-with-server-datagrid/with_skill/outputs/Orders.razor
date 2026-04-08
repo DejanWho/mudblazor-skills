@@ -1,0 +1,123 @@
+@page "/orders"
+@rendermode InteractiveServer
+@inject OrderService OrderService
+@inject IDialogService DialogService
+
+<PageTitle>Orders</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Orders</MudText>
+
+<MudDataGrid T="Order"
+             ServerData="LoadServerDataAsync"
+             @ref="_grid"
+             Dense="true"
+             Hover="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Order list</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString"
+                      Placeholder="Search by customer name..."
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      Immediate="true"
+                      DebounceInterval="300"
+                      OnDebounceIntervalElapsed="OnSearchChanged"
+                      Clearable="true"
+                      Class="mt-0"
+                      Style="max-width: 320px;" />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.OrderId" Title="Order ID" />
+        <PropertyColumn Property="x => x.CustomerName" Title="Customer" />
+        <PropertyColumn Property="x => x.Total" Title="Total" Format="C" />
+        <PropertyColumn Property="x => x.CreatedAt" Title="Created" Format="yyyy-MM-dd" />
+        <TemplateColumn Title="Actions" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                               Size="Size.Small"
+                               Color="Color.Primary"
+                               OnClick="@(() => ViewOrderAsync(context.Item))"
+                               aria-label="View order" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <NoRecordsContent>
+        <MudStack AlignItems="AlignItems.Center" Class="pa-4">
+            <MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" />
+            <MudText>No orders found</MudText>
+        </MudStack>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudStack AlignItems="AlignItems.Center" Class="pa-4">
+            <MudProgressCircular Indeterminate="true" />
+            <MudText>Loading orders...</MudText>
+        </MudStack>
+    </LoadingContent>
+    <PagerContent>
+        <MudDataGridPager T="Order"
+                          PageSizeOptions="new[] { 10, 25, 50, 100 }" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private MudDataGrid<Order> _grid = default!;
+    private string _searchString = string.Empty;
+
+    private async Task<GridData<Order>> LoadServerDataAsync(
+        GridState<Order> state,
+        CancellationToken cancellationToken)
+    {
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        var sortBy = sortDefinition?.SortBy;
+        var descending = sortDefinition?.Descending ?? false;
+
+        var skip = state.Page * state.PageSize;
+        var take = state.PageSize;
+
+        var (items, totalCount) = await OrderService.QueryAsync(
+            skip,
+            take,
+            string.IsNullOrWhiteSpace(_searchString) ? null : _searchString,
+            sortBy,
+            descending,
+            cancellationToken);
+
+        return new GridData<Order>
+        {
+            Items = items,
+            TotalItems = totalCount
+        };
+    }
+
+    private async Task OnSearchChanged()
+    {
+        if (_grid is not null)
+        {
+            await _grid.ReloadServerData();
+        }
+    }
+
+    private async Task ViewOrderAsync(Order order)
+    {
+        var parameters = new DialogParameters<OrderDetailsDialog>
+        {
+            { x => x.OrderId, order.OrderId }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            CloseButton = true,
+            MaxWidth = MaxWidth.ExtraSmall,
+            FullWidth = true
+        };
+
+        var dialog = await DialogService.ShowAsync<OrderDetailsDialog>(
+            "View order",
+            parameters,
+            options);
+
+        await dialog.Result;
+    }
+}

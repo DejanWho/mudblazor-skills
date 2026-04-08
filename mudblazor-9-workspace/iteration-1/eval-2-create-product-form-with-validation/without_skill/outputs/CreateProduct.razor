@@ -1,0 +1,151 @@
+@page "/products/new"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@inject ProductService ProductService
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>Create Product</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-6">
+    <MudText Typo="Typo.h4" Class="mb-4">Create Product</MudText>
+
+    <MudPaper Class="pa-6" Elevation="2">
+        <EditForm Model="_model" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+
+            <MudGrid Spacing="4">
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.Name"
+                                  For="@(() => _model.Name)"
+                                  Label="Name"
+                                  Required="true"
+                                  RequiredError="Name is required"
+                                  Variant="Variant.Outlined"
+                                  Immediate="true" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.SKU"
+                                  For="@(() => _model.SKU)"
+                                  Label="SKU"
+                                  Required="true"
+                                  RequiredError="SKU is required"
+                                  Variant="Variant.Outlined"
+                                  HelperText="Format: ABC-1234"
+                                  Immediate="true" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudNumericField @bind-Value="_model.Price"
+                                     For="@(() => _model.Price)"
+                                     Label="Price"
+                                     Required="true"
+                                     RequiredError="Price is required"
+                                     Variant="Variant.Outlined"
+                                     Format="C2"
+                                     Culture="@System.Globalization.CultureInfo.CurrentCulture"
+                                     Min="0.01m"
+                                     Immediate="true" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudSelect T="string"
+                               @bind-Value="_model.Category"
+                               For="@(() => _model.Category)"
+                               Label="Category"
+                               Required="true"
+                               RequiredError="Category is required"
+                               Variant="Variant.Outlined">
+                        <MudSelectItem Value="@("Electronics")">Electronics</MudSelectItem>
+                        <MudSelectItem Value="@("Clothing")">Clothing</MudSelectItem>
+                        <MudSelectItem Value="@("Food")">Food</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudCheckBox @bind-Value="_model.InStock"
+                                 Label="In Stock"
+                                 Color="Color.Primary" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField @bind-Value="_model.Description"
+                                  For="@(() => _model.Description)"
+                                  Label="Description"
+                                  Variant="Variant.Outlined"
+                                  Lines="4"
+                                  Counter="500"
+                                  MaxLength="500"
+                                  Immediate="true" />
+                </MudItem>
+
+                <MudItem xs="12" Class="d-flex justify-end gap-2">
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Default"
+                               OnClick="HandleCancel">
+                        Cancel
+                    </MudButton>
+                    <MudButton ButtonType="ButtonType.Submit"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Disabled="@_isSubmitting">
+                        @(_isSubmitting ? "Saving..." : "Create")
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private ProductModel _model = new();
+    private bool _isSubmitting;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            _isSubmitting = true;
+            await ProductService.CreateAsync(_model);
+            Snackbar.Add("Product created successfully!", Severity.Success);
+            _model = new ProductModel();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to create product: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private void HandleCancel()
+    {
+        Navigation.NavigateTo("/products");
+    }
+
+    public class ProductModel
+    {
+        [Required(ErrorMessage = "Name is required")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 100 characters")]
+        public string Name { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "SKU is required")]
+        [RegularExpression(@"^[A-Z]{3}-\d{4}$", ErrorMessage = "SKU must match format: ABC-1234 (3 uppercase letters, dash, 4 digits)")]
+        public string SKU { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Price is required")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
+        public decimal Price { get; set; }
+
+        [Required(ErrorMessage = "Category is required")]
+        public string Category { get; set; } = string.Empty;
+
+        public bool InStock { get; set; }
+
+        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
+        public string? Description { get; set; }
+    }
+}

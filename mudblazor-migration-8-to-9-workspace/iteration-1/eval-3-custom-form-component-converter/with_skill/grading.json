@@ -1,0 +1,46 @@
+{
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "expectations": [
+    {
+      "id": "overrides-get-default-converter",
+      "text": "TagsInput.razor.cs overrides GetDefaultConverter()",
+      "passed": true,
+      "evidence": "override IConverter<List<string>?, string?> GetDefaultConverter("
+    },
+    {
+      "id": "no-write-value-async",
+      "text": "No longer overrides WriteValueAsync",
+      "passed": true,
+      "evidence": "confirmed absent: override\\s+\\w[\\w<>,?\\s]*\\s+WriteValueAsync\\s*\\("
+    },
+    {
+      "id": "uses-set-value-core-async",
+      "text": "Overrides SetValueCoreAsync",
+      "passed": true,
+      "evidence": "override Task SetValueCoreAsync("
+    },
+    {
+      "id": "no-base-converter-call",
+      "text": "Constructor no longer passes a Converter to base()",
+      "passed": true,
+      "evidence": "confirmed absent: :\\s*base\\s*\\(\\s*new\\s+DefaultConverter"
+    },
+    {
+      "id": "uses-validate-async",
+      "text": "Validate() override renamed to ValidateAsync()",
+      "passed": true,
+      "evidence": "override async Task ValidateAsync("
+    },
+    {
+      "id": "preserves-tags-parsing-behavior",
+      "text": "Preserves comma-split + trim tag parsing behavior",
+      "passed": true,
+      "evidence": ".Split( | .Trim("
+    }
+  ]
+}

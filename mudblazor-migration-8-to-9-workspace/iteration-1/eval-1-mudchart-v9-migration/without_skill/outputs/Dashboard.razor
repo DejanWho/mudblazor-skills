@@ -1,0 +1,101 @@
+@page "/dashboard"
+
+<MudText Typo="Typo.h4" GutterBottom="true">Sales Dashboard</MudText>
+
+<MudGrid>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-4">
+            <MudText Typo="Typo.h6" GutterBottom="true">Revenue by Month</MudText>
+            <MudChart ChartType="ChartType.Bar"
+                      ChartSeries="@_revenueSeries"
+                      XAxisLabels="@_months"
+                      Width="100%"
+                      Height="350px"
+                      AxisChartOptions="@_axisChartOptions"
+                      ChartOptions="@_chartOptions" />
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-4">
+            <MudText Typo="Typo.h6" GutterBottom="true">Sales by Category</MudText>
+            <MudChart ChartType="ChartType.Pie"
+                      ChartSeries="@_categorySeries"
+                      XAxisLabels="@_categoryLabels"
+                      Width="100%"
+                      Height="350px" />
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12">
+        <MudPaper Class="pa-4">
+            <MudText Typo="Typo.h6" GutterBottom="true">Daily Visitors</MudText>
+            <MudTimeSeriesChart ChartSeries="@_visitorSeries"
+                                Width="100%"
+                                Height="300px"
+                                ChartOptions="@_timeSeriesOptions" />
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private List<ChartSeries> _revenueSeries = new()
+    {
+        new ChartSeries
+        {
+            Name = "2025",
+            Data = new double[] { 40000, 52000, 48000, 61000, 70000, 68000 }
+        },
+        new ChartSeries
+        {
+            Name = "2026",
+            Data = new double[] { 45000, 58000, 53000, 67000, 75000, 0 }
+        }
+    };
+
+    private string[] _months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun" };
+
+    private List<ChartSeries> _categorySeries = new()
+    {
+        new ChartSeries
+        {
+            Name = "Sales by Category",
+            Data = new double[] { 35, 25, 20, 15, 5 }
+        }
+    };
+    private string[] _categoryLabels = { "Electronics", "Apparel", "Home", "Sports", "Other" };
+
+    private AxisChartOptions _axisChartOptions = new()
+    {
+        MatchBoundsToSize = true
+    };
+
+    private ChartOptions _chartOptions = new()
+    {
+        YAxisTicks = 10000,
+        YAxisFormat = "C0",
+        InterpolationOption = InterpolationOption.NaturalSpline
+    };
+
+    private List<TimeSeriesChartSeries> _visitorSeries = new()
+    {
+        new TimeSeriesChartSeries
+        {
+            Name = "Visitors",
+            Data = new List<TimeSeriesChartSeries.TimeValue>
+            {
+                new(DateTime.Today.AddDays(-6), 1200),
+                new(DateTime.Today.AddDays(-5), 1450),
+                new(DateTime.Today.AddDays(-4), 1380),
+                new(DateTime.Today.AddDays(-3), 1620),
+                new(DateTime.Today.AddDays(-2), 1750),
+                new(DateTime.Today.AddDays(-1), 1830),
+                new(DateTime.Today, 1920)
+            }
+        }
+    };
+
+    private TimeSeriesChartOptions _timeSeriesOptions = new()
+    {
+        ChartPalette = new[] { "#594AE2" },
+        TimeLabelSpacing = TimeSpan.FromDays(1)
+    };
+}

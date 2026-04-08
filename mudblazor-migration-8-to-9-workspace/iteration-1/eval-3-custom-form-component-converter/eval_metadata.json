@@ -1,0 +1,31 @@
+{
+  "eval_id": 3,
+  "eval_name": "custom-form-component-converter",
+  "prompt": "After upgrading my Blazor Server project to MudBlazor 9, my custom MudFormComponent fails to compile with errors about GetDefaultConverter, WriteValueAsync, and a missing constructor overload. The file is at /Users/dejanwho/Projects/Code/mudblazor-skills/mudblazor-migration-8-to-9/evals/fixtures/eval-3-custom-form-component/TagsInput.razor.cs. Please update it to compile against MudBlazor 9 while preserving its original behavior.",
+  "assertions": [
+    {
+      "id": "overrides-get-default-converter",
+      "text": "TagsInput.razor.cs overrides GetDefaultConverter() (the abstract method new in v9)"
+    },
+    {
+      "id": "no-write-value-async",
+      "text": "TagsInput.razor.cs no longer overrides WriteValueAsync (renamed to SetValueCoreAsync in v9)"
+    },
+    {
+      "id": "uses-set-value-core-async",
+      "text": "TagsInput.razor.cs overrides SetValueCoreAsync as the v9 replacement for WriteValueAsync"
+    },
+    {
+      "id": "no-base-converter-call",
+      "text": "TagsInput.razor.cs constructor no longer passes a Converter to base() (the constructor overload was removed)"
+    },
+    {
+      "id": "uses-validate-async",
+      "text": "TagsInput.razor.cs override of Validate() is renamed to ValidateAsync() (the v9 async name)"
+    },
+    {
+      "id": "preserves-tags-parsing-behavior",
+      "text": "TagsInput.razor.cs preserves the original behavior of splitting on commas and trimming each tag"
+    }
+  ]
+}

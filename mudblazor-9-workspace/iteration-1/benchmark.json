@@ -1,0 +1,623 @@
+{
+  "metadata": {
+    "skill_name": "mudblazor-9",
+    "skill_path": "/Users/dejanwho/Projects/Code/mudblazor-skills/mudblazor-9",
+    "executor_model": "claude-opus-4-6",
+    "analyzer_model": "claude-opus-4-6",
+    "timestamp": "2026-04-08T09:12:43Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1-orders-page-with-server-datagrid",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "time_seconds": 70.1,
+        "tokens": 85763,
+        "tool_calls": 6,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "has-page-directive",
+          "text": "Orders.razor declares @page \"/orders\"",
+          "passed": true,
+          "evidence": "@page \"/orders\""
+        },
+        {
+          "id": "has-render-mode",
+          "text": "Declares @rendermode InteractiveServer",
+          "passed": true,
+          "evidence": "@rendermode InteractiveServer"
+        },
+        {
+          "id": "uses-mud-data-grid-typed",
+          "text": "Uses MudDataGrid<Order>",
+          "passed": true,
+          "evidence": "MudDataGrid T=\"Order\""
+        },
+        {
+          "id": "uses-server-data-with-cancellation",
+          "text": "ServerData delegate accepts CancellationToken and passes to QueryAsync",
+          "passed": true,
+          "evidence": "ServerData= | CancellationToken"
+        },
+        {
+          "id": "has-debounced-search",
+          "text": "Has search MudTextField with DebounceInterval=\"300\"",
+          "passed": true,
+          "evidence": "DebounceInterval=\"300\""
+        },
+        {
+          "id": "has-property-columns-formatted",
+          "text": "PropertyColumns for OrderId, CustomerName, Total (currency), CreatedAt (yyyy-MM-dd)",
+          "passed": true,
+          "evidence": "Format=\"C\" | Format=\"yyyy-MM-dd\""
+        },
+        {
+          "id": "has-pager-with-page-sizes",
+          "text": "MudDataGridPager with page sizes 10, 25, 50, 100",
+          "passed": true,
+          "evidence": "MudDataGridPager | new[] { 10, 25, 50, 100"
+        },
+        {
+          "id": "has-view-action-column",
+          "text": "Action column with per-row View button that opens a dialog",
+          "passed": true,
+          "evidence": "TemplateColumn | MudIconButton"
+        },
+        {
+          "id": "uses-show-async",
+          "text": "Dialog opening uses await DialogService.ShowAsync",
+          "passed": true,
+          "evidence": "DialogService.ShowAsync"
+        },
+        {
+          "id": "dialog-component-exists",
+          "text": "A dialog .razor component is created showing the order ID",
+          "passed": true,
+          "evidence": "<MudDialog>"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1-orders-page-with-server-datagrid",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 8,
+        "failed": 2,
+        "total": 10,
+        "time_seconds": 46.0,
+        "tokens": 63749,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "has-page-directive",
+          "text": "Orders.razor declares @page \"/orders\"",
+          "passed": true,
+          "evidence": "@page \"/orders\""
+        },
+        {
+          "id": "has-render-mode",
+          "text": "Declares @rendermode InteractiveServer",
+          "passed": false,
+          "evidence": "pattern not found: @rendermode\\s+InteractiveServer"
+        },
+        {
+          "id": "uses-mud-data-grid-typed",
+          "text": "Uses MudDataGrid<Order>",
+          "passed": true,
+          "evidence": "MudDataGrid T=\"Order\""
+        },
+        {
+          "id": "uses-server-data-with-cancellation",
+          "text": "ServerData delegate accepts CancellationToken and passes to QueryAsync",
+          "passed": true,
+          "evidence": "ServerData= | CancellationToken"
+        },
+        {
+          "id": "has-debounced-search",
+          "text": "Has search MudTextField with DebounceInterval=\"300\"",
+          "passed": true,
+          "evidence": "DebounceInterval=\"300\""
+        },
+        {
+          "id": "has-property-columns-formatted",
+          "text": "PropertyColumns for OrderId, CustomerName, Total (currency), CreatedAt (yyyy-MM-dd)",
+          "passed": false,
+          "evidence": "pattern not found: Format\\s*=\\s*\"(?:C\\d*|\\{0:C[^\"]*\\})\" | pattern not found: Format\\s*=\\s*\"yyyy-MM-dd\""
+        },
+        {
+          "id": "has-pager-with-page-sizes",
+          "text": "MudDataGridPager with page sizes 10, 25, 50, 100",
+          "passed": true,
+          "evidence": "MudDataGridPager | 10, 25, 50, 100"
+        },
+        {
+          "id": "has-view-action-column",
+          "text": "Action column with per-row View button that opens a dialog",
+          "passed": true,
+          "evidence": "TemplateColumn | MudIconButton"
+        },
+        {
+          "id": "uses-show-async",
+          "text": "Dialog opening uses await DialogService.ShowAsync",
+          "passed": true,
+          "evidence": "DialogService.ShowAsync"
+        },
+        {
+          "id": "dialog-component-exists",
+          "text": "A dialog .razor component is created showing the order ID",
+          "passed": true,
+          "evidence": "<MudDialog>"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2-create-product-form-with-validation",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 13,
+        "failed": 0,
+        "total": 13,
+        "time_seconds": 54.6,
+        "tokens": 76953,
+        "tool_calls": 5,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "has-page-directive",
+          "text": "CreateProduct.razor declares @page \"/products/new\"",
+          "passed": true,
+          "evidence": "@page \"/products/new\""
+        },
+        {
+          "id": "uses-edit-form",
+          "text": "Uses <EditForm Model=...>",
+          "passed": true,
+          "evidence": "<EditForm"
+        },
+        {
+          "id": "uses-data-annotations-validator",
+          "text": "Includes <DataAnnotationsValidator />",
+          "passed": true,
+          "evidence": "<DataAnnotationsValidator />"
+        },
+        {
+          "id": "model-has-required-name-with-length",
+          "text": "Model has [Required] and [StringLength(100, MinimumLength = 3)] on Name",
+          "passed": true,
+          "evidence": "[Required(ErrorMessage = \"Name | StringLength(100, MinimumLength = 3"
+        },
+        {
+          "id": "model-has-sku-regex",
+          "text": "Model has [RegularExpression] on SKU",
+          "passed": true,
+          "evidence": "RegularExpression(@\"^[A-Z]{3}-\\d{4}$\""
+        },
+        {
+          "id": "model-has-price-range",
+          "text": "Model has [Range] on Price",
+          "passed": true,
+          "evidence": "[Range("
+        },
+        {
+          "id": "model-has-description-length",
+          "text": "Model has [StringLength(500)] on Description",
+          "passed": true,
+          "evidence": "StringLength(500"
+        },
+        {
+          "id": "submit-button-is-submit-type",
+          "text": "Submit button uses ButtonType=\"ButtonType.Submit\"",
+          "passed": true,
+          "evidence": "ButtonType=\"ButtonType.Submit\""
+        },
+        {
+          "id": "inputs-have-for-binding",
+          "text": "Inputs use For=\"@(() => model.X)\"",
+          "passed": true,
+          "evidence": "For=\"@(() => _model."
+        },
+        {
+          "id": "calls-service-on-valid-submit",
+          "text": "OnValidSubmit handler calls ProductService.CreateAsync",
+          "passed": true,
+          "evidence": "ProductService.CreateAsync"
+        },
+        {
+          "id": "shows-snackbar-on-success",
+          "text": "Calls Snackbar.Add with Severity.Success",
+          "passed": true,
+          "evidence": "Snackbar.Add(\"Product created\", Severity.Success"
+        },
+        {
+          "id": "resets-form-after-submit",
+          "text": "Resets the model after submit",
+          "passed": true,
+          "evidence": "_model = new("
+        },
+        {
+          "id": "cancel-navigates-back",
+          "text": "Cancel button navigates to /products",
+          "passed": true,
+          "evidence": "NavigateTo(\"/products\""
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2-create-product-form-with-validation",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 13,
+        "failed": 0,
+        "total": 13,
+        "time_seconds": 41.4,
+        "tokens": 63546,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "has-page-directive",
+          "text": "CreateProduct.razor declares @page \"/products/new\"",
+          "passed": true,
+          "evidence": "@page \"/products/new\""
+        },
+        {
+          "id": "uses-edit-form",
+          "text": "Uses <EditForm Model=...>",
+          "passed": true,
+          "evidence": "<EditForm"
+        },
+        {
+          "id": "uses-data-annotations-validator",
+          "text": "Includes <DataAnnotationsValidator />",
+          "passed": true,
+          "evidence": "<DataAnnotationsValidator />"
+        },
+        {
+          "id": "model-has-required-name-with-length",
+          "text": "Model has [Required] and [StringLength(100, MinimumLength = 3)] on Name",
+          "passed": true,
+          "evidence": "[Required(ErrorMessage = \"Name | StringLength(100, MinimumLength = 3"
+        },
+        {
+          "id": "model-has-sku-regex",
+          "text": "Model has [RegularExpression] on SKU",
+          "passed": true,
+          "evidence": "RegularExpression(@\"^[A-Z]{3}-\\d{4}$\""
+        },
+        {
+          "id": "model-has-price-range",
+          "text": "Model has [Range] on Price",
+          "passed": true,
+          "evidence": "[Range("
+        },
+        {
+          "id": "model-has-description-length",
+          "text": "Model has [StringLength(500)] on Description",
+          "passed": true,
+          "evidence": "StringLength(500"
+        },
+        {
+          "id": "submit-button-is-submit-type",
+          "text": "Submit button uses ButtonType=\"ButtonType.Submit\"",
+          "passed": true,
+          "evidence": "ButtonType=\"ButtonType.Submit\""
+        },
+        {
+          "id": "inputs-have-for-binding",
+          "text": "Inputs use For=\"@(() => model.X)\"",
+          "passed": true,
+          "evidence": "For=\"@(() => _model."
+        },
+        {
+          "id": "calls-service-on-valid-submit",
+          "text": "OnValidSubmit handler calls ProductService.CreateAsync",
+          "passed": true,
+          "evidence": "ProductService.CreateAsync"
+        },
+        {
+          "id": "shows-snackbar-on-success",
+          "text": "Calls Snackbar.Add with Severity.Success",
+          "passed": true,
+          "evidence": "Snackbar.Add(\"Product created successfully!\", Severity.Success"
+        },
+        {
+          "id": "resets-form-after-submit",
+          "text": "Resets the model after submit",
+          "passed": true,
+          "evidence": "_model = new("
+        },
+        {
+          "id": "cancel-navigates-back",
+          "text": "Cancel button navigates to /products",
+          "passed": true,
+          "evidence": "NavigateTo(\"/products\""
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3-custom-theme-with-dark-mode-toggle",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 14,
+        "failed": 0,
+        "total": 14,
+        "time_seconds": 55.8,
+        "tokens": 76992,
+        "tool_calls": 5,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "has-mud-theme-provider",
+          "text": "Includes <MudThemeProvider> with Theme bound",
+          "passed": true,
+          "evidence": "<MudThemeProvider @ref=\"_mudThemeProvider\"\n                  Theme="
+        },
+        {
+          "id": "has-mud-popover-provider",
+          "text": "Includes <MudPopoverProvider />",
+          "passed": true,
+          "evidence": "<MudPopoverProvider />"
+        },
+        {
+          "id": "has-mud-dialog-provider",
+          "text": "Includes <MudDialogProvider />",
+          "passed": true,
+          "evidence": "<MudDialogProvider"
+        },
+        {
+          "id": "has-mud-snackbar-provider",
+          "text": "Includes <MudSnackbarProvider />",
+          "passed": true,
+          "evidence": "<MudSnackbarProvider />"
+        },
+        {
+          "id": "popover-before-dialog",
+          "text": "MudPopoverProvider appears BEFORE MudDialogProvider",
+          "passed": true,
+          "evidence": "Popover idx=182, Dialog idx=205"
+        },
+        {
+          "id": "theme-has-primary-color",
+          "text": "Custom theme sets Primary = \"#0EA5E9\"",
+          "passed": true,
+          "evidence": "Primary = \"#0EA5E9\""
+        },
+        {
+          "id": "theme-has-secondary-color",
+          "text": "Custom theme sets Secondary = \"#64748B\"",
+          "passed": true,
+          "evidence": "Secondary = \"#64748B\""
+        },
+        {
+          "id": "theme-has-border-radius",
+          "text": "Theme sets LayoutProperties.DefaultBorderRadius = \"8px\"",
+          "passed": true,
+          "evidence": "DefaultBorderRadius = \"8px\""
+        },
+        {
+          "id": "theme-has-drawer-width",
+          "text": "Theme sets LayoutProperties.DrawerWidthLeft = \"280px\"",
+          "passed": true,
+          "evidence": "DrawerWidthLeft = \"280px\""
+        },
+        {
+          "id": "follows-os-dark-mode",
+          "text": "Calls GetSystemDarkModeAsync() (v9 method)",
+          "passed": true,
+          "evidence": "GetSystemDarkModeAsync"
+        },
+        {
+          "id": "has-toggle-button",
+          "text": "AppBar has MudIconButton with sun/moon icons",
+          "passed": true,
+          "evidence": "MudIconButton | DarkMode"
+        },
+        {
+          "id": "uses-localstorage-via-jsinterop",
+          "text": "Toggle handler persists to localStorage via IJSRuntime",
+          "passed": true,
+          "evidence": "localStorage.getItem"
+        },
+        {
+          "id": "preserves-app-name",
+          "text": "Preserves 'Acme Dashboard' in the AppBar",
+          "passed": true,
+          "evidence": "Acme Dashboard"
+        },
+        {
+          "id": "preserves-nav-links",
+          "text": "Preserves Home/Users/Settings NavLinks",
+          "passed": true,
+          "evidence": "Href=\"/users\" | Href=\"/settings\""
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3-custom-theme-with-dark-mode-toggle",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.9285714285714286,
+        "passed": 13,
+        "failed": 1,
+        "total": 14,
+        "time_seconds": 34.1,
+        "tokens": 62989,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "has-mud-theme-provider",
+          "text": "Includes <MudThemeProvider> with Theme bound",
+          "passed": true,
+          "evidence": "<MudThemeProvider @ref=\"_mudThemeProvider\" Theme="
+        },
+        {
+          "id": "has-mud-popover-provider",
+          "text": "Includes <MudPopoverProvider />",
+          "passed": true,
+          "evidence": "<MudPopoverProvider />"
+        },
+        {
+          "id": "has-mud-dialog-provider",
+          "text": "Includes <MudDialogProvider />",
+          "passed": true,
+          "evidence": "<MudDialogProvider"
+        },
+        {
+          "id": "has-mud-snackbar-provider",
+          "text": "Includes <MudSnackbarProvider />",
+          "passed": true,
+          "evidence": "<MudSnackbarProvider />"
+        },
+        {
+          "id": "popover-before-dialog",
+          "text": "MudPopoverProvider appears BEFORE MudDialogProvider",
+          "passed": true,
+          "evidence": "Popover idx=140, Dialog idx=163"
+        },
+        {
+          "id": "theme-has-primary-color",
+          "text": "Custom theme sets Primary = \"#0EA5E9\"",
+          "passed": true,
+          "evidence": "Primary = \"#0EA5E9\""
+        },
+        {
+          "id": "theme-has-secondary-color",
+          "text": "Custom theme sets Secondary = \"#64748B\"",
+          "passed": true,
+          "evidence": "Secondary = \"#64748B\""
+        },
+        {
+          "id": "theme-has-border-radius",
+          "text": "Theme sets LayoutProperties.DefaultBorderRadius = \"8px\"",
+          "passed": true,
+          "evidence": "DefaultBorderRadius = \"8px\""
+        },
+        {
+          "id": "theme-has-drawer-width",
+          "text": "Theme sets LayoutProperties.DrawerWidthLeft = \"280px\"",
+          "passed": true,
+          "evidence": "DrawerWidthLeft = \"280px\""
+        },
+        {
+          "id": "follows-os-dark-mode",
+          "text": "Calls GetSystemDarkModeAsync() (v9 method)",
+          "passed": false,
+          "evidence": "pattern not found: GetSystemDarkModeAsync"
+        },
+        {
+          "id": "has-toggle-button",
+          "text": "AppBar has MudIconButton with sun/moon icons",
+          "passed": true,
+          "evidence": "MudIconButton | DarkMode"
+        },
+        {
+          "id": "uses-localstorage-via-jsinterop",
+          "text": "Toggle handler persists to localStorage via IJSRuntime",
+          "passed": true,
+          "evidence": "localStorage.getItem"
+        },
+        {
+          "id": "preserves-app-name",
+          "text": "Preserves 'Acme Dashboard' in the AppBar",
+          "passed": true,
+          "evidence": "Acme Dashboard"
+        },
+        {
+          "id": "preserves-nav-links",
+          "text": "Preserves Home/Users/Settings NavLinks",
+          "passed": true,
+          "evidence": "Href=\"/users\" | Href=\"/settings\""
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 60.1667,
+        "stddev": 8.6234,
+        "min": 54.6,
+        "max": 70.1
+      },
+      "tokens": {
+        "mean": 79902.6667,
+        "stddev": 5075.235,
+        "min": 76953,
+        "max": 85763
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.9095,
+        "stddev": 0.1014,
+        "min": 0.8,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 40.5,
+        "stddev": 6.0008,
+        "min": 34.1,
+        "max": 46.0
+      },
+      "tokens": {
+        "mean": 63428,
+        "stddev": 393.501,
+        "min": 62989,
+        "max": 63749
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.09",
+      "time_seconds": "+19.7",
+      "tokens": "+16475"
+    }
+  },
+  "notes": []
+}

@@ -1,0 +1,59 @@
+{
+  "eval_id": 2,
+  "eval_name": "create-product-form-with-validation",
+  "prompt": "Add a /products/new page with EditForm + DataAnnotations validation. Fields: Name (required, 3-100 chars), SKU (required, regex ^[A-Z]{3}-\\d{4}$), Price (required, > 0, currency-formatted), Category (dropdown of Electronics/Clothing/Food), InStock (checkbox), Description (optional, max 500 chars). On valid submit: call ProductService.CreateAsync, show success snackbar, reset form. On cancel: navigate to /products.",
+  "assertions": [
+    {
+      "id": "has-page-directive",
+      "text": "CreateProduct.razor declares @page \"/products/new\""
+    },
+    {
+      "id": "uses-edit-form",
+      "text": "CreateProduct.razor uses <EditForm Model=...> (not MudForm)"
+    },
+    {
+      "id": "uses-data-annotations-validator",
+      "text": "CreateProduct.razor uses <DataAnnotationsValidator /> as a child of EditForm"
+    },
+    {
+      "id": "model-has-required-name-with-length",
+      "text": "The model class has [Required] and [StringLength(100, MinimumLength = 3)] (or equivalent) on Name"
+    },
+    {
+      "id": "model-has-sku-regex",
+      "text": "The model class has [RegularExpression(\"^[A-Z]{3}-\\\\d{4}$\")] on SKU"
+    },
+    {
+      "id": "model-has-price-range",
+      "text": "The model class has [Range] (or [Range(0.01, ...)]) on Price ensuring > 0"
+    },
+    {
+      "id": "model-has-description-length",
+      "text": "The model class has [StringLength(500)] (or equivalent) on Description"
+    },
+    {
+      "id": "submit-button-is-submit-type",
+      "text": "The submit button uses ButtonType=\"ButtonType.Submit\" (required for EditForm submit)"
+    },
+    {
+      "id": "inputs-have-for-binding",
+      "text": "MudBlazor inputs have For=\"@(() => model.X)\" so validation messages are wired"
+    },
+    {
+      "id": "calls-service-on-valid-submit",
+      "text": "OnValidSubmit handler calls ProductService.CreateAsync with the model"
+    },
+    {
+      "id": "shows-snackbar-on-success",
+      "text": "After successful submit, the code calls Snackbar.Add(...) with Severity.Success"
+    },
+    {
+      "id": "resets-form-after-submit",
+      "text": "After successful submit, the model is reset (e.g., new instance assigned)"
+    },
+    {
+      "id": "cancel-navigates-back",
+      "text": "The cancel button navigates to /products via NavigationManager.NavigateTo"
+    }
+  ]
+}

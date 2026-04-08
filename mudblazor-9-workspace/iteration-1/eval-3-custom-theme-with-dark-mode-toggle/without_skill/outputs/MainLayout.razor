@@ -1,0 +1,93 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime JS
+
+<MudThemeProvider @ref="_mudThemeProvider" Theme="_theme" IsDarkMode="_isDarkMode" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudText Typo="Typo.h6" Class="ml-2">Acme Dashboard</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                       Color="Color.Inherit"
+                       OnClick="ToggleDarkModeAsync"
+                       Title="@(_isDarkMode ? "Switch to light mode" : "Switch to dark mode")" />
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="1" Width="280px">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">Acme Dashboard</MudText>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            <MudNavLink Href="/users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">Users</MudNavLink>
+            <MudNavLink Href="/settings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Settings</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private const string DarkModeStorageKey = "acme-dashboard-dark-mode";
+
+    private MudThemeProvider _mudThemeProvider = null!;
+    private bool _drawerOpen = true;
+    private bool _isDarkMode;
+    private bool _userHasChosen;
+
+    private readonly MudTheme _theme = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#0EA5E9",
+            Secondary = "#64748B"
+        },
+        PaletteDark = new PaletteDark
+        {
+            Primary = "#0EA5E9",
+            Secondary = "#64748B"
+        },
+        LayoutProperties = new LayoutProperties
+        {
+            DefaultBorderRadius = "8px",
+            DrawerWidthLeft = "280px",
+            DrawerWidthRight = "280px"
+        }
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Try to read saved preference from localStorage
+            var saved = await JS.InvokeAsync<string?>("localStorage.getItem", DarkModeStorageKey);
+
+            if (!string.IsNullOrEmpty(saved) && bool.TryParse(saved, out var savedMode))
+            {
+                _userHasChosen = true;
+                _isDarkMode = savedMode;
+            }
+            else
+            {
+                // Fall back to the OS / browser preference on first load
+                _isDarkMode = await _mudThemeProvider.GetSystemPreference();
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleDarkModeAsync()
+    {
+        _isDarkMode = !_isDarkMode;
+        _userHasChosen = true;
+        await JS.InvokeVoidAsync("localStorage.setItem", DarkModeStorageKey, _isDarkMode.ToString());
+    }
+}

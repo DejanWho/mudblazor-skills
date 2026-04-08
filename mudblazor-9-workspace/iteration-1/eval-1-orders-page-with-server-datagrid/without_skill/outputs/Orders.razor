@@ -1,0 +1,116 @@
+@page "/orders"
+@using System.Threading
+@using MudBlazor
+@inject OrderService OrderService
+@inject IDialogService DialogService
+
+<PageTitle>Orders</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Orders</MudText>
+
+<MudDataGrid T="Order"
+             @ref="_dataGrid"
+             ServerData="LoadServerData"
+             SortMode="SortMode.Single"
+             Filterable="false"
+             Hideable="false"
+             Dense="true"
+             Hover="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Order List</MudText>
+        <MudSpacer />
+        <MudTextField T="string"
+                      Value="_searchText"
+                      ValueChanged="OnSearchChanged"
+                      Placeholder="Search by customer..."
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      Clearable="true"
+                      Immediate="true"
+                      DebounceInterval="300"
+                      Class="mt-0" />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.OrderId" Title="Order ID" />
+        <PropertyColumn Property="x => x.CustomerName" Title="Customer Name" />
+        <PropertyColumn Property="x => x.Total" Title="Total">
+            <CellTemplate>
+                @context.Item.Total.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.CreatedAt" Title="Created At">
+            <CellTemplate>
+                @context.Item.CreatedAt.ToString("yyyy-MM-dd")
+            </CellTemplate>
+        </PropertyColumn>
+        <TemplateColumn Title="Actions" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                               Size="Size.Small"
+                               Color="Color.Primary"
+                               OnClick="@(() => ViewOrder(context.Item))"
+                               aria-label="View order" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Order" PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private MudDataGrid<Order>? _dataGrid;
+    private string? _searchText;
+
+    private async Task<GridData<Order>> LoadServerData(GridState<Order> state, CancellationToken cancellationToken)
+    {
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        var sortBy = sortDefinition?.SortBy;
+        var descending = sortDefinition?.Descending ?? false;
+
+        var skip = state.Page * state.PageSize;
+        var take = state.PageSize;
+
+        var (items, totalCount) = await OrderService.QueryAsync(
+            skip,
+            take,
+            _searchText,
+            sortBy,
+            descending,
+            cancellationToken);
+
+        return new GridData<Order>
+        {
+            Items = items,
+            TotalItems = totalCount
+        };
+    }
+
+    private async Task OnSearchChanged(string value)
+    {
+        _searchText = value;
+        if (_dataGrid is not null)
+        {
+            await _dataGrid.ReloadServerData();
+        }
+    }
+
+    private async Task ViewOrder(Order order)
+    {
+        var parameters = new DialogParameters<OrderDetailsDialog>
+        {
+            { x => x.OrderId, order.OrderId }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.ExtraSmall,
+            FullWidth = true
+        };
+
+        var dialog = await DialogService.ShowAsync<OrderDetailsDialog>("Confirm View Order", parameters, options);
+        await dialog.Result;
+    }
+}

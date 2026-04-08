@@ -1,0 +1,98 @@
+@page "/dashboard"
+
+<MudText Typo="Typo.h4" GutterBottom="true">Sales Dashboard</MudText>
+
+<MudGrid>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-4">
+            <MudText Typo="Typo.h6" GutterBottom="true">Revenue by Month</MudText>
+            <MudChart ChartType="ChartType.Bar"
+                      ChartSeries="@_revenueSeries"
+                      ChartLabels="@_months"
+                      Width="100%"
+                      Height="350px"
+                      ChartOptions="@_barOptions" />
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-4">
+            <MudText Typo="Typo.h6" GutterBottom="true">Sales by Category</MudText>
+            <MudChart ChartType="ChartType.Pie"
+                      ChartSeries="@_categorySeries"
+                      ChartLabels="@_categoryLabels"
+                      Width="100%"
+                      Height="350px" />
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12">
+        <MudPaper Class="pa-4">
+            <MudText Typo="Typo.h6" GutterBottom="true">Daily Visitors</MudText>
+            <MudChart ChartType="ChartType.TimeSeries"
+                      ChartSeries="@_visitorSeries"
+                      ChartLabels="@_visitorLabels"
+                      Width="100%"
+                      Height="300px"
+                      ChartOptions="@_timeSeriesOptions" />
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private List<ChartSeries<double>> _revenueSeries = new()
+    {
+        new ChartSeries<double>
+        {
+            Name = "2025",
+            Data = new double[] { 40000, 52000, 48000, 61000, 70000, 68000 }.AsChartDataSet()
+        },
+        new ChartSeries<double>
+        {
+            Name = "2026",
+            Data = new double[] { 45000, 58000, 53000, 67000, 75000, 0 }.AsChartDataSet()
+        }
+    };
+
+    private string[] _months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun" };
+
+    private List<ChartSeries<double>> _categorySeries = new()
+    {
+        new ChartSeries<double>
+        {
+            Data = new double[] { 35, 25, 20, 15, 5 }.AsChartDataSet()
+        }
+    };
+    private string[] _categoryLabels = { "Electronics", "Apparel", "Home", "Sports", "Other" };
+
+    private BarChartOptions _barOptions = new()
+    {
+        YAxisTicks = 10000,
+        YAxisFormat = "C0",
+        InterpolationOption = InterpolationOption.NaturalSpline
+    };
+
+    private List<ChartSeries<double>> _visitorSeries = new()
+    {
+        new ChartSeries<double>
+        {
+            Name = "Visitors",
+            Data = new double[] { 1200, 1450, 1380, 1620, 1750, 1830, 1920 }.AsChartDataSet()
+        }
+    };
+
+    private string[] _visitorLabels =
+    {
+        DateTime.Today.AddDays(-6).ToString("MM/dd"),
+        DateTime.Today.AddDays(-5).ToString("MM/dd"),
+        DateTime.Today.AddDays(-4).ToString("MM/dd"),
+        DateTime.Today.AddDays(-3).ToString("MM/dd"),
+        DateTime.Today.AddDays(-2).ToString("MM/dd"),
+        DateTime.Today.AddDays(-1).ToString("MM/dd"),
+        DateTime.Today.ToString("MM/dd")
+    };
+
+    private TimeSeriesChartOptions _timeSeriesOptions = new()
+    {
+        ChartPalette = new[] { "#594AE2" },
+        TimeLabelSpacing = TimeSpan.FromDays(1)
+    };
+}

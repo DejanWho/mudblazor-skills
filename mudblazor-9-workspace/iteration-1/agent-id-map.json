@@ -1,0 +1,14 @@
+{
+  "eval-1-orders-page-with-server-datagrid": {
+    "with_skill": "a7f5ac4427543038d",
+    "without_skill": "a54a8cf2f51ee9949"
+  },
+  "eval-2-create-product-form-with-validation": {
+    "with_skill": "a20db2f3dd84ab31b",
+    "without_skill": "a210dba8c222f7819"
+  },
+  "eval-3-custom-theme-with-dark-mode-toggle": {
+    "with_skill": "a193f632e3238911c",
+    "without_skill": "a901a46236b601c51"
+  }
+}

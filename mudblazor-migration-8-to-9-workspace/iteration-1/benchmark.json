@@ -1,0 +1,431 @@
+{
+  "metadata": {
+    "skill_name": "mudblazor-migration-8-to-9",
+    "skill_path": "/Users/dejanwho/Projects/Code/mudblazor-skills/mudblazor-migration-8-to-9",
+    "executor_model": "claude-opus-4-6",
+    "analyzer_model": "claude-opus-4-6",
+    "timestamp": "2026-04-08T09:12:43Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1-mudchart-v9-migration",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 79.1,
+        "tokens": 87153,
+        "tool_calls": 5,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "no-input-data",
+          "text": "Dashboard.razor no longer uses the v8 'InputData' parameter on MudChart",
+          "passed": true,
+          "evidence": "confirmed absent: InputData\\s*="
+        },
+        {
+          "id": "no-x-axis-labels",
+          "text": "Dashboard.razor no longer uses the v8 'XAxisLabels' parameter",
+          "passed": true,
+          "evidence": "confirmed absent: XAxisLabels\\s*="
+        },
+        {
+          "id": "no-input-labels",
+          "text": "Dashboard.razor no longer uses the v8 'InputLabels' parameter",
+          "passed": true,
+          "evidence": "confirmed absent: InputLabels\\s*="
+        },
+        {
+          "id": "no-mud-time-series-chart",
+          "text": "Dashboard.razor no longer uses the removed <MudTimeSeriesChart> component",
+          "passed": true,
+          "evidence": "confirmed absent: <MudTimeSeriesChart\\b"
+        },
+        {
+          "id": "uses-chart-series-typed",
+          "text": "Dashboard.razor uses the typed ChartSeries<T> generic for chart data",
+          "passed": true,
+          "evidence": "ChartSeries<double>"
+        },
+        {
+          "id": "uses-bar-chart-options",
+          "text": "Dashboard.razor uses BarChartOptions (or similar type-specific options class)",
+          "passed": true,
+          "evidence": "BarChartOptions"
+        },
+        {
+          "id": "uses-as-chart-data-set",
+          "text": "Dashboard.razor wraps chart data with .AsChartDataSet()",
+          "passed": true,
+          "evidence": ".AsChartDataSet()"
+        },
+        {
+          "id": "preserves-page-directive",
+          "text": "Dashboard.razor preserves the @page \"/dashboard\" route",
+          "passed": true,
+          "evidence": "@page \"/dashboard\""
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1-mudchart-v9-migration",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.375,
+        "passed": 3,
+        "failed": 5,
+        "total": 8,
+        "time_seconds": 47.9,
+        "tokens": 64809,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "no-input-data",
+          "text": "Dashboard.razor no longer uses the v8 'InputData' parameter on MudChart",
+          "passed": true,
+          "evidence": "confirmed absent: InputData\\s*="
+        },
+        {
+          "id": "no-x-axis-labels",
+          "text": "Dashboard.razor no longer uses the v8 'XAxisLabels' parameter",
+          "passed": false,
+          "evidence": "unwanted pattern found: XAxisLabels="
+        },
+        {
+          "id": "no-input-labels",
+          "text": "Dashboard.razor no longer uses the v8 'InputLabels' parameter",
+          "passed": true,
+          "evidence": "confirmed absent: InputLabels\\s*="
+        },
+        {
+          "id": "no-mud-time-series-chart",
+          "text": "Dashboard.razor no longer uses the removed <MudTimeSeriesChart> component",
+          "passed": false,
+          "evidence": "unwanted pattern found: <MudTimeSeriesChart"
+        },
+        {
+          "id": "uses-chart-series-typed",
+          "text": "Dashboard.razor uses the typed ChartSeries<T> generic for chart data",
+          "passed": false,
+          "evidence": "pattern not found: ChartSeries<\\w+>"
+        },
+        {
+          "id": "uses-bar-chart-options",
+          "text": "Dashboard.razor uses BarChartOptions (or similar type-specific options class)",
+          "passed": false,
+          "evidence": "pattern not found: BarChartOptions|LineChartOptions|DonutChartOptions|PieChartOptions"
+        },
+        {
+          "id": "uses-as-chart-data-set",
+          "text": "Dashboard.razor wraps chart data with .AsChartDataSet()",
+          "passed": false,
+          "evidence": "pattern not found: \\.AsChartDataSet\\(\\)"
+        },
+        {
+          "id": "preserves-page-directive",
+          "text": "Dashboard.razor preserves the @page \"/dashboard\" route",
+          "passed": true,
+          "evidence": "@page \"/dashboard\""
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2-dialog-async-and-menu-context",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 65.0,
+        "tokens": 87022,
+        "tool_calls": 6,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "no-sync-show",
+          "text": "UserList.razor no longer calls DialogService.Show<...>(...) (synchronous v8 method)",
+          "passed": true,
+          "evidence": "confirmed absent: DialogService\\.Show<[^>]+>\\("
+        },
+        {
+          "id": "uses-show-async",
+          "text": "UserList.razor uses await DialogService.ShowAsync<...>(...)",
+          "passed": true,
+          "evidence": "DialogService.ShowAsync<"
+        },
+        {
+          "id": "uses-show-message-box-async",
+          "text": "UserList.razor uses ShowMessageBoxAsync",
+          "passed": true,
+          "evidence": "ShowMessageBoxAsync"
+        },
+        {
+          "id": "server-data-takes-cancellation-token",
+          "text": "LoadServerDataAsync accepts CancellationToken as second parameter",
+          "passed": true,
+          "evidence": "LoadServerDataAsync(GridState<User> state, CancellationToken cancellationToken"
+        },
+        {
+          "id": "menu-uses-context-toggle",
+          "text": "MudMenu's ActivatorContent button wires OnClick to @context.ToggleAsync",
+          "passed": true,
+          "evidence": "context.ToggleAsync"
+        },
+        {
+          "id": "preserves-route",
+          "text": "UserList.razor preserves the @page \"/users\" route",
+          "passed": true,
+          "evidence": "@page \"/users\""
+        },
+        {
+          "id": "preserves-grid-columns",
+          "text": "UserList.razor preserves all four grid columns",
+          "passed": true,
+          "evidence": "Property=\"x => x.Id\" | Property=\"x => x.Email\""
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2-dialog-async-and-menu-context",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.7142857142857143,
+        "passed": 5,
+        "failed": 2,
+        "total": 7,
+        "time_seconds": 50.8,
+        "tokens": 65062,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "no-sync-show",
+          "text": "UserList.razor no longer calls DialogService.Show<...>(...) (synchronous v8 method)",
+          "passed": true,
+          "evidence": "confirmed absent: DialogService\\.Show<[^>]+>\\("
+        },
+        {
+          "id": "uses-show-async",
+          "text": "UserList.razor uses await DialogService.ShowAsync<...>(...)",
+          "passed": true,
+          "evidence": "DialogService.ShowAsync<"
+        },
+        {
+          "id": "uses-show-message-box-async",
+          "text": "UserList.razor uses ShowMessageBoxAsync",
+          "passed": false,
+          "evidence": "pattern not found: ShowMessageBoxAsync"
+        },
+        {
+          "id": "server-data-takes-cancellation-token",
+          "text": "LoadServerDataAsync accepts CancellationToken as second parameter",
+          "passed": true,
+          "evidence": "LoadServerDataAsync(GridState<User> state, CancellationToken cancellationToken"
+        },
+        {
+          "id": "menu-uses-context-toggle",
+          "text": "MudMenu's ActivatorContent button wires OnClick to @context.ToggleAsync",
+          "passed": false,
+          "evidence": "pattern not found: context\\.(?:ToggleAsync|OpenAsync)"
+        },
+        {
+          "id": "preserves-route",
+          "text": "UserList.razor preserves the @page \"/users\" route",
+          "passed": true,
+          "evidence": "@page \"/users\""
+        },
+        {
+          "id": "preserves-grid-columns",
+          "text": "UserList.razor preserves all four grid columns",
+          "passed": true,
+          "evidence": "Property=\"x => x.Id\" | Property=\"x => x.Email\""
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3-custom-form-component-converter",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 74.3,
+        "tokens": 86578,
+        "tool_calls": 5,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "overrides-get-default-converter",
+          "text": "TagsInput.razor.cs overrides GetDefaultConverter()",
+          "passed": true,
+          "evidence": "override IConverter<List<string>?, string?> GetDefaultConverter("
+        },
+        {
+          "id": "no-write-value-async",
+          "text": "No longer overrides WriteValueAsync",
+          "passed": true,
+          "evidence": "confirmed absent: override\\s+\\w[\\w<>,?\\s]*\\s+WriteValueAsync\\s*\\("
+        },
+        {
+          "id": "uses-set-value-core-async",
+          "text": "Overrides SetValueCoreAsync",
+          "passed": true,
+          "evidence": "override Task SetValueCoreAsync("
+        },
+        {
+          "id": "no-base-converter-call",
+          "text": "Constructor no longer passes a Converter to base()",
+          "passed": true,
+          "evidence": "confirmed absent: :\\s*base\\s*\\(\\s*new\\s+DefaultConverter"
+        },
+        {
+          "id": "uses-validate-async",
+          "text": "Validate() override renamed to ValidateAsync()",
+          "passed": true,
+          "evidence": "override async Task ValidateAsync("
+        },
+        {
+          "id": "preserves-tags-parsing-behavior",
+          "text": "Preserves comma-split + trim tag parsing behavior",
+          "passed": true,
+          "evidence": ".Split( | .Trim("
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3-custom-form-component-converter",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6666666666666666,
+        "passed": 4,
+        "failed": 2,
+        "total": 6,
+        "time_seconds": 48.3,
+        "tokens": 64218,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "overrides-get-default-converter",
+          "text": "TagsInput.razor.cs overrides GetDefaultConverter()",
+          "passed": true,
+          "evidence": "override Converter<List<string>, string> GetDefaultConverter("
+        },
+        {
+          "id": "no-write-value-async",
+          "text": "No longer overrides WriteValueAsync",
+          "passed": true,
+          "evidence": "confirmed absent: override\\s+\\w[\\w<>,?\\s]*\\s+WriteValueAsync\\s*\\("
+        },
+        {
+          "id": "uses-set-value-core-async",
+          "text": "Overrides SetValueCoreAsync",
+          "passed": false,
+          "evidence": "pattern not found: override\\s+\\w[\\w<>,?\\s]*\\s+SetValueCoreAsync\\s*\\("
+        },
+        {
+          "id": "no-base-converter-call",
+          "text": "Constructor no longer passes a Converter to base()",
+          "passed": true,
+          "evidence": "confirmed absent: :\\s*base\\s*\\(\\s*new\\s+DefaultConverter"
+        },
+        {
+          "id": "uses-validate-async",
+          "text": "Validate() override renamed to ValidateAsync()",
+          "passed": false,
+          "evidence": "pattern not found: override\\s+\\w[\\w<>,?\\s]*\\s+ValidateAsync\\s*\\("
+        },
+        {
+          "id": "preserves-tags-parsing-behavior",
+          "text": "Preserves comma-split + trim tag parsing behavior",
+          "passed": true,
+          "evidence": ".Split( | .Trim("
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 72.8,
+        "stddev": 7.1687,
+        "min": 65.0,
+        "max": 79.1
+      },
+      "tokens": {
+        "mean": 86917.6667,
+        "stddev": 301.3641,
+        "min": 86578,
+        "max": 87153
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.5853,
+        "stddev": 0.1837,
+        "min": 0.375,
+        "max": 0.7143
+      },
+      "time_seconds": {
+        "mean": 49.0,
+        "stddev": 1.5716,
+        "min": 47.9,
+        "max": 50.8
+      },
+      "tokens": {
+        "mean": 64696.3333,
+        "stddev": 433.1332,
+        "min": 64218,
+        "max": 65062
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.41",
+      "time_seconds": "+23.8",
+      "tokens": "+22221"
+    }
+  },
+  "notes": []
+}

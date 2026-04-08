@@ -1,0 +1,88 @@
+{
+  "summary": {
+    "passed": 13,
+    "failed": 0,
+    "total": 13,
+    "pass_rate": 1.0
+  },
+  "expectations": [
+    {
+      "id": "has-page-directive",
+      "text": "CreateProduct.razor declares @page \"/products/new\"",
+      "passed": true,
+      "evidence": "@page \"/products/new\""
+    },
+    {
+      "id": "uses-edit-form",
+      "text": "Uses <EditForm Model=...>",
+      "passed": true,
+      "evidence": "<EditForm"
+    },
+    {
+      "id": "uses-data-annotations-validator",
+      "text": "Includes <DataAnnotationsValidator />",
+      "passed": true,
+      "evidence": "<DataAnnotationsValidator />"
+    },
+    {
+      "id": "model-has-required-name-with-length",
+      "text": "Model has [Required] and [StringLength(100, MinimumLength = 3)] on Name",
+      "passed": true,
+      "evidence": "[Required(ErrorMessage = \"Name | StringLength(100, MinimumLength = 3"
+    },
+    {
+      "id": "model-has-sku-regex",
+      "text": "Model has [RegularExpression] on SKU",
+      "passed": true,
+      "evidence": "RegularExpression(@\"^[A-Z]{3}-\\d{4}$\""
+    },
+    {
+      "id": "model-has-price-range",
+      "text": "Model has [Range] on Price",
+      "passed": true,
+      "evidence": "[Range("
+    },
+    {
+      "id": "model-has-description-length",
+      "text": "Model has [StringLength(500)] on Description",
+      "passed": true,
+      "evidence": "StringLength(500"
+    },
+    {
+      "id": "submit-button-is-submit-type",
+      "text": "Submit button uses ButtonType=\"ButtonType.Submit\"",
+      "passed": true,
+      "evidence": "ButtonType=\"ButtonType.Submit\""
+    },
+    {
+      "id": "inputs-have-for-binding",
+      "text": "Inputs use For=\"@(() => model.X)\"",
+      "passed": true,
+      "evidence": "For=\"@(() => _model."
+    },
+    {
+      "id": "calls-service-on-valid-submit",
+      "text": "OnValidSubmit handler calls ProductService.CreateAsync",
+      "passed": true,
+      "evidence": "ProductService.CreateAsync"
+    },
+    {
+      "id": "shows-snackbar-on-success",
+      "text": "Calls Snackbar.Add with Severity.Success",
+      "passed": true,
+      "evidence": "Snackbar.Add(\"Product created\", Severity.Success"
+    },
+    {
+      "id": "resets-form-after-submit",
+      "text": "Resets the model after submit",
+      "passed": true,
+      "evidence": "_model = new("
+    },
+    {
+      "id": "cancel-navigates-back",
+      "text": "Cancel button navigates to /products",
+      "passed": true,
+      "evidence": "NavigateTo(\"/products\""
+    }
+  ]
+}

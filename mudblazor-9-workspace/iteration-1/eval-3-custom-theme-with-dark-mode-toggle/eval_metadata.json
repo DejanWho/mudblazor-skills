@@ -1,0 +1,63 @@
+{
+  "eval_id": 3,
+  "eval_name": "custom-theme-with-dark-mode-toggle",
+  "prompt": "Update MainLayout.razor to set up a custom MudTheme (primary #0EA5E9, secondary #64748B, border radius 8px, drawer width 280px), follow OS dark-mode preference on first load, AppBar toggle button (sun/moon) that flips modes, persist choice to localStorage. All four required MudBlazor providers in correct order. Existing layout has AppBar 'Acme Dashboard' and a drawer with Home/Users/Settings nav links.",
+  "assertions": [
+    {
+      "id": "has-mud-theme-provider",
+      "text": "MainLayout.razor includes <MudThemeProvider> with Theme bound to a custom theme field"
+    },
+    {
+      "id": "has-mud-popover-provider",
+      "text": "MainLayout.razor includes <MudPopoverProvider />"
+    },
+    {
+      "id": "has-mud-dialog-provider",
+      "text": "MainLayout.razor includes <MudDialogProvider />"
+    },
+    {
+      "id": "has-mud-snackbar-provider",
+      "text": "MainLayout.razor includes <MudSnackbarProvider />"
+    },
+    {
+      "id": "popover-before-dialog",
+      "text": "MudPopoverProvider appears BEFORE MudDialogProvider in the markup (the critical v9 ordering rule)"
+    },
+    {
+      "id": "theme-has-primary-color",
+      "text": "The custom theme's PaletteLight (and ideally PaletteDark) sets Primary = \"#0EA5E9\""
+    },
+    {
+      "id": "theme-has-secondary-color",
+      "text": "The custom theme's PaletteLight (and ideally PaletteDark) sets Secondary = \"#64748B\""
+    },
+    {
+      "id": "theme-has-border-radius",
+      "text": "The custom theme sets LayoutProperties.DefaultBorderRadius = \"8px\""
+    },
+    {
+      "id": "theme-has-drawer-width",
+      "text": "The custom theme sets LayoutProperties.DrawerWidthLeft = \"280px\""
+    },
+    {
+      "id": "follows-os-dark-mode",
+      "text": "The component calls GetSystemDarkModeAsync() (the v9 method, not the removed GetSystemPreference) on first render to follow OS preference"
+    },
+    {
+      "id": "has-toggle-button",
+      "text": "The AppBar has a MudIconButton wired to a toggle handler with sun/moon icons (LightMode/DarkMode or similar)"
+    },
+    {
+      "id": "uses-localstorage-via-jsinterop",
+      "text": "The toggle handler persists the choice to localStorage via IJSRuntime (e.g., localStorage.setItem)"
+    },
+    {
+      "id": "preserves-app-name",
+      "text": "MainLayout.razor preserves the 'Acme Dashboard' app name in the AppBar"
+    },
+    {
+      "id": "preserves-nav-links",
+      "text": "MainLayout.razor preserves the Home/Users/Settings NavLinks in the drawer"
+    }
+  ]
+}
