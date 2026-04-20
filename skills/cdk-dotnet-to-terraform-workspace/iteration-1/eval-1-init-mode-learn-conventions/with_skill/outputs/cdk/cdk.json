@@ -1,0 +1,11 @@
+{
+  "app": "dotnet run --project src/BedrockChat.csproj",
+  "context": {
+    "@aws-cdk/core:target-partitions": ["aws"],
+    "environment": "dev",
+    "region": "eu-central-1",
+    "vpc-cidr": "10.30.0.0/16",
+    "claude-sonnet-model-id": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+    "claude-haiku-model-id": "anthropic.claude-3-haiku-20240307-v1:0"
+  }
+}

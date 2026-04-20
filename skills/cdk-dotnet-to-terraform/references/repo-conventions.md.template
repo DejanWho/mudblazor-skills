@@ -1,0 +1,112 @@
+# Repo Conventions (TEMPLATE)
+
+**This file is a template. Init mode writes the real `repo-conventions.md` (without the `.template` suffix) in this same directory after walking the host repo.** If you see this file during convert mode without a sibling `repo-conventions.md`, run init first.
+
+Fill every `<FILL IN>` during init. Mark genuinely inapplicable sections `N/A — <short reason>` rather than deleting them.
+
+---
+
+## 1. Repo layout
+
+- **Terraform root(s):** `<FILL IN — absolute-or-relative paths to directories containing .tf files that form the top of the Terraform tree(s) in this repo>`
+- **Multiple trees?** `<FILL IN — Yes / No. If yes, list them with a one-line purpose each>`
+- **Which tree does this skill target?** `<FILL IN — the tree where CDK-converted output will land>`
+
+## 2. Module layout
+
+- **Module directory:** `<FILL IN — e.g. terraform/modules/, infra/modules/>`
+- **Module-naming convention:** `<FILL IN — e.g. kebab-case, no prefix; or `aws-<service>`; or service-prefixed>`
+- **How modules are consumed:** `<FILL IN — relative `source = "../../modules/..."`, git ref pinning, private registry, etc.>`
+- **Module versioning:** `<FILL IN — none (monorepo, always latest) / git tags / semver in registry>`
+
+## 3. File layout inside a module
+
+- **Standard files:** `<FILL IN — e.g. main.tf, variables.tf, outputs.tf, versions.tf (+ README.md)>`
+- **What goes in `main.tf`:** `<FILL IN — resources only; or resources + locals; or everything except variables/outputs>`
+- **Use of `locals.tf`:** `<FILL IN — separate file / inline in main / N/A>`
+- **`versions.tf` contents:** `<FILL IN — terraform { required_version, required_providers } block with pinned versions? Just required_version?>`
+- **README per module?** `<FILL IN — Yes/No. Format: hand-written / terraform-docs auto-generated / Markdown template>`
+
+## 4. Root / live config layout
+
+- **Environments directory:** `<FILL IN — e.g. terraform/live/<env>/<app>/, infra/envs/{dev,stg,prd}/>`
+- **Environment split pattern:** `<FILL IN — folder per env / workspaces / single config + tfvars>`
+- **File organization in root:** `<FILL IN — one main.tf calling modules; or split by subsystem (network.tf, compute.tf, data.tf); or other>`
+
+## 5. Naming conventions
+
+- **Variables:** `<FILL IN — snake_case, required-first-optional-later ordering? prefix conventions for env-specific vs stack-specific>`
+- **Outputs:** `<FILL IN — snake_case with `_arn`/`_id`/`_name` suffixes? patterns for collections like `_ids` vs `_by_name`>`
+- **Resource labels:** `<FILL IN — resource "aws_vpc" "this" vs "main" vs "primary"; collections use for_each with what key style>`
+- **Module instance names:** `<FILL IN — module "vpc" or module "network" or module "prod_vpc">`
+- **Physical resource naming:** `<FILL IN — does the repo set explicit `name`/`bucket`/etc. properties, or let AWS auto-name? Prefix conventions (`${var.env}-${var.app}-...`)>`
+
+## 6. Tagging
+
+- **Source of tags:** `<FILL IN — default_tags on provider / explicit tags variable per module / both / neither>`
+- **Required keys:** `<FILL IN — e.g. Environment, Application, Owner, CostCenter>`
+- **How modules accept extra tags:** `<FILL IN — `tags = {}` variable merged with `locals.tags_common` / variadic merge / not allowed>`
+- **Are tags set on every resource type that supports them?** `<FILL IN — Yes/No; any known exceptions>`
+
+## 7. Provider configuration
+
+- **Provider declaration location:** `<FILL IN — root configs only / also in modules / `required_providers` in every module's versions.tf>`
+- **`default_tags` used?** `<FILL IN — Yes/No, and what's in it>`
+- **`aws` provider version floor:** `<FILL IN — e.g. `~> 5.70`>`
+- **Multiple provider instances / aliases?** `<FILL IN — e.g. us-east-1 alias for ACM cert, cross-account role assumption, etc.>`
+- **Assume-role or profile config pattern:** `<FILL IN — static profile / assume_role block / AWS SSO / GitHub OIDC>`
+
+## 8. Backend configuration
+
+- **Backend type:** `<FILL IN — s3 / remote / local / tfc>`
+- **State key pattern:** `<FILL IN — e.g. `<env>/<app>/terraform.tfstate`, `<service>/<env>/terraform.tfstate`>`
+- **Lock mechanism:** `<FILL IN — DynamoDB table name / S3 native locking / TFC native>`
+- **Backend config source:** `<FILL IN — hardcoded in backend block / partial + -backend-config / via Terragrunt / CI-only>`
+
+## 9. Cross-module / cross-stack references
+
+- **Pattern:** `<FILL IN — module outputs within a root config / data.terraform_remote_state between root configs / SSM parameters / hybrid>`
+- **SSM parameter naming (if used):** `<FILL IN — e.g. `/<env>/<app>/<resource-type>/<name>`>`
+- **Remote state key pattern (if used):** `<FILL IN — how the reading config locates the writing config's state>`
+
+## 10. Terraform version floor
+
+- **`required_version`:** `<FILL IN — e.g. ">= 1.5, < 2.0"`>`
+- **Uses `import` blocks?** `<FILL IN — Yes/No. If Yes, where; if No, how is adoption handled (CLI `terraform import` + commit after)>`
+- **Uses `for_each` on modules?** `<FILL IN — Yes/No>`
+- **Uses `moved` blocks?** `<FILL IN — Yes/No>`
+
+## 11. Secrets handling
+
+- **Where secrets live:** `<FILL IN — Secrets Manager / SSM SecureString / external-set outside Terraform / sensitive variables>`
+- **How Terraform reads them (if at all):** `<FILL IN — data sources / injected via TF_VAR_ / never read; resources only reference ARNs>`
+- **Never-in-state policy:** `<FILL IN — are there things the team refuses to put in state (actual secret values)?>`
+
+## 12. Documentation conventions
+
+- **Module README format:** `<FILL IN>`
+- **Inline comment style:** `<FILL IN — sparse / dense / standard header block>`
+- **CHANGELOG / release notes per module?** `<FILL IN>`
+
+## 13. Inconsistencies noted during init
+
+List anywhere the repo isn't fully consistent, and which pattern to prefer going forward:
+
+- `<FILL IN — e.g. "Half of older modules declare `provider "aws"` inside the module body; newer modules don't. Follow the newer pattern for all conversions."`>`
+- `<FILL IN>`
+- `<FILL IN>`
+
+If nothing is inconsistent, write `None observed.`
+
+## 14. Open questions / deferred decisions
+
+Things init couldn't resolve that the user should eventually settle:
+
+- `<FILL IN — e.g. "Tagging is inconsistent across modules; the team should decide on a canonical tags-common map.">`
+- `<FILL IN>`
+
+If nothing is open, write `None.`
+
+---
+
+*This file was generated by `cdk-dotnet-to-terraform` init mode on `<FILL IN date>`. Re-run init if the repo's Terraform style changes or new module patterns emerge. Commit this file so future sessions and reviewers share the same understanding.*

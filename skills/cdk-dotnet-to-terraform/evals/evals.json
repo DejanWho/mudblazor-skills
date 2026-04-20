@@ -1,0 +1,73 @@
+{
+  "skill_name": "cdk-dotnet-to-terraform",
+  "evals": [
+    {
+      "id": 1,
+      "name": "init-mode-learn-conventions",
+      "prompt": "I'd like you to analyze my existing Terraform repo and learn its conventions before we do any CDK-to-Terraform work. Walk the modules under modules/, read the live configs under live/, and summarize the conventions you find. If you have a skill loaded, use its 'init' workflow and persist what you learned to its reference files. Otherwise just produce two markdown files: repo-conventions.md and module-inventory.md.",
+      "files": [],
+      "assertions": [
+        { "id": "conventions-file-exists", "text": "repo-conventions.md is produced and non-trivial (>800 bytes)" },
+        { "id": "conventions-no-fill-in-placeholders", "text": "repo-conventions.md has no unfilled <FILL IN> placeholders" },
+        { "id": "conventions-documents-module-file-layout", "text": "repo-conventions.md mentions the module file layout (main.tf/variables.tf/outputs.tf/versions.tf)" },
+        { "id": "conventions-documents-snake-case-variables", "text": "repo-conventions.md identifies the snake_case variable convention" },
+        { "id": "conventions-documents-tagging-pattern", "text": "repo-conventions.md documents the tagging pattern (common_tags / default_tags / merge)" },
+        { "id": "conventions-documents-backend", "text": "repo-conventions.md mentions the S3 backend" },
+        { "id": "conventions-documents-provider-version", "text": "repo-conventions.md documents the AWS provider version floor (~> 5.70)" },
+        { "id": "conventions-documents-region", "text": "repo-conventions.md mentions the eu-central-1 default region" },
+        { "id": "conventions-documents-resource-label-convention", "text": "repo-conventions.md identifies the `this` resource-label convention" },
+        { "id": "conventions-documents-per-rule-sg-style", "text": "repo-conventions.md mentions the per-resource SG rule style (aws_vpc_security_group_*_rule)" },
+        { "id": "inventory-file-exists", "text": "module-inventory.md is produced and non-trivial (>400 bytes)" },
+        { "id": "inventory-lists-network", "text": "module-inventory.md lists the network module" },
+        { "id": "inventory-lists-alb", "text": "module-inventory.md lists the alb module" },
+        { "id": "inventory-lists-ecs-service", "text": "module-inventory.md lists the ecs-service module" },
+        { "id": "inventory-lists-iam-role", "text": "module-inventory.md lists the iam-role module" },
+        { "id": "inventory-documents-inputs-outputs", "text": "module-inventory.md documents Inputs and Outputs for modules" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "convert-greenfield-bedrock-stack",
+      "prompt": "Convert the CDK .NET 8 project into Terraform that fits the repo. Everything is greenfield. Reuse the modules where they fit (network, alb, ecs-service, iam-role). The stack: ALB → Fargate → Bedrock (Claude 3.5 Sonnet, Claude 3 Haiku) with a private VPC endpoint for bedrock-runtime.",
+      "files": [],
+      "assertions": [
+        { "id": "has-new-live-config-dir", "text": "New live config directory under live/dev/ with main.tf" },
+        { "id": "has-variables-tf", "text": "New live config has a variables.tf" },
+        { "id": "has-versions-tf", "text": "New live config has a versions.tf" },
+        { "id": "calls-network-module", "text": "main.tf calls the existing network module" },
+        { "id": "calls-alb-module", "text": "main.tf calls the existing alb module" },
+        { "id": "calls-ecs-service-module", "text": "main.tf calls the existing ecs-service module" },
+        { "id": "has-bedrock-invoke-model", "text": "Grants bedrock:InvokeModel" },
+        { "id": "has-bedrock-invoke-stream", "text": "Grants bedrock:InvokeModelWithResponseStream" },
+        { "id": "has-claude-sonnet-arn", "text": "References claude-3-5-sonnet foundation model" },
+        { "id": "has-claude-haiku-arn", "text": "References claude-3-haiku foundation model" },
+        { "id": "has-bedrock-vpc-endpoint", "text": "Creates an interface VPC endpoint for bedrock-runtime" },
+        { "id": "no-cdk-csharp-syntax-in-tf", "text": "No C# / CDK syntax leaked into .tf files" },
+        { "id": "backend-s3-in-versions-tf", "text": "versions.tf includes a backend \"s3\" block" },
+        { "id": "provider-eu-central-1", "text": "Provider region is eu-central-1" },
+        { "id": "no-cdk-token-references-left", "text": "No CFN Fn:: / Ref:: tokens remain" },
+        { "id": "uses-for-each-or-matches-style", "text": "Tagging pattern matches repo (default_tags or local.common_tags)" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "convert-with-vpc-import",
+      "prompt": "Same conversion but the VPC vpc-0a1b2c3d4e5f6a7b8 is already deployed and must be imported via an import block. Everything else is greenfield.",
+      "files": [],
+      "assertions": [
+        { "id": "has-new-live-config-dir", "text": "New live config directory under live/dev/ with main.tf" },
+        { "id": "calls-network-module", "text": "main.tf calls the existing network module (not raw aws_vpc)" },
+        { "id": "calls-alb-module", "text": "main.tf calls the existing alb module" },
+        { "id": "calls-ecs-service-module", "text": "main.tf calls the existing ecs-service module" },
+        { "id": "has-bedrock-invoke-model", "text": "Grants bedrock:InvokeModel" },
+        { "id": "has-bedrock-invoke-stream", "text": "Grants bedrock:InvokeModelWithResponseStream" },
+        { "id": "has-bedrock-vpc-endpoint", "text": "Creates an interface VPC endpoint for bedrock-runtime" },
+        { "id": "has-imports-tf", "text": "imports.tf exists in the new live config dir" },
+        { "id": "has-vpc-import-block", "text": "imports.tf contains an import block with vpc-0a1b2c3d4e5f6a7b8" },
+        { "id": "import-to-addresses-vpc", "text": "Import `to =` addresses a VPC resource (module or raw)" },
+        { "id": "no-duplicate-vpc-resource", "text": "No raw aws_vpc resource at the live-config level that would conflict with the module-owned one" },
+        { "id": "no-cdk-csharp-syntax-in-tf", "text": "No C# / CDK syntax leaked into .tf files" }
+      ]
+    }
+  ]
+}

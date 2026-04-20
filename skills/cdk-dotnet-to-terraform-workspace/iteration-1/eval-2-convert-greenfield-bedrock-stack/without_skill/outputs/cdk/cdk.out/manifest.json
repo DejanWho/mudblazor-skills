@@ -1,0 +1,22 @@
+{
+  "version": "36.0.0",
+  "artifacts": {
+    "BedrockChatStack-dev.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "BedrockChatStack-dev.assets.json"
+      }
+    },
+    "BedrockChatStack-dev": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://000000000000/eu-central-1",
+      "properties": {
+        "templateFile": "BedrockChatStack-dev.template.json",
+        "stackName": "BedrockChatStack-dev"
+      },
+      "dependencies": ["BedrockChatStack-dev.assets"],
+      "metadata": {},
+      "displayName": "BedrockChatStack-dev"
+    }
+  }
+}

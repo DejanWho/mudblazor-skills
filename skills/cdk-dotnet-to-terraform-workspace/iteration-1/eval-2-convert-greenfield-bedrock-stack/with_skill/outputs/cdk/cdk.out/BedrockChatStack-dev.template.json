@@ -1,0 +1,306 @@
+{
+  "Description": "Bedrock-backed chat API: ALB \u2192 Fargate \u2192 Bedrock (Anthropic Claude)",
+  "Resources": {
+    "Vpc8378EB38": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.30.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          { "Key": "Application", "Value": "bedrock-chat" },
+          { "Key": "Environment", "Value": "dev" },
+          { "Key": "ManagedBy", "Value": "cdk" },
+          { "Key": "Name", "Value": "BedrockChatStack-dev/Vpc" }
+        ]
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/Vpc/Resource" }
+    },
+
+    "VpcpublicSubnet1Subnet5C2D37C4": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref": "Vpc8378EB38" },
+        "AvailabilityZone": "eu-central-1a",
+        "CidrBlock": "10.30.0.0/24",
+        "MapPublicIpOnLaunch": true
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/Vpc/publicSubnet1/Subnet" }
+    },
+
+    "VpcprivateSubnet1Subnet934893E8": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref": "Vpc8378EB38" },
+        "AvailabilityZone": "eu-central-1a",
+        "CidrBlock": "10.30.3.0/24",
+        "MapPublicIpOnLaunch": false
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/Vpc/privateSubnet1/Subnet" }
+    },
+
+    "BedrockEndpointSg1234ABCD": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Allow Fargate tasks to reach the Bedrock runtime interface endpoint",
+        "SecurityGroupEgress": [
+          { "CidrIp": "255.255.255.255/32", "Description": "Disallow all traffic", "IpProtocol": "icmp", "FromPort": 252, "ToPort": 86 }
+        ],
+        "VpcId": { "Ref": "Vpc8378EB38" }
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/BedrockEndpointSg/Resource" }
+    },
+
+    "VpcBedrockRuntimeEndpointABCDEF12": {
+      "Type": "AWS::EC2::VPCEndpoint",
+      "Properties": {
+        "ServiceName": "com.amazonaws.eu-central-1.bedrock-runtime",
+        "VpcEndpointType": "Interface",
+        "VpcId": { "Ref": "Vpc8378EB38" },
+        "PrivateDnsEnabled": true,
+        "SecurityGroupIds": [{ "Fn::GetAtt": ["BedrockEndpointSg1234ABCD", "GroupId"] }],
+        "SubnetIds": [
+          { "Ref": "VpcprivateSubnet1Subnet934893E8" }
+        ]
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/Vpc/BedrockRuntimeEndpoint/Resource" }
+    },
+
+    "Cluster4082FD3A": {
+      "Type": "AWS::ECS::Cluster",
+      "Properties": {
+        "ClusterSettings": [
+          { "Name": "containerInsights", "Value": "enhanced" }
+        ]
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/Cluster/Resource" }
+    },
+
+    "TaskLogGroup1234ABCD": {
+      "Type": "AWS::Logs::LogGroup",
+      "DeletionPolicy": "Delete",
+      "UpdateReplacePolicy": "Delete",
+      "Properties": {
+        "LogGroupName": "/ecs/bedrock-chat-dev",
+        "RetentionInDays": 30
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/TaskLogGroup/Resource" }
+    },
+
+    "TaskExecutionRole1234EFGH": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            { "Effect": "Allow", "Principal": { "Service": "ecs-tasks.amazonaws.com" }, "Action": "sts:AssumeRole" }
+          ]
+        },
+        "ManagedPolicyArns": [
+          { "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy" }
+        ]
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/TaskExecutionRole/Resource" }
+    },
+
+    "TaskRole30FC0FBB": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            { "Effect": "Allow", "Principal": { "Service": "ecs-tasks.amazonaws.com" }, "Action": "sts:AssumeRole" }
+          ]
+        }
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/TaskRole/Resource" }
+    },
+
+    "TaskRoleDefaultPolicyIJKL5678": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "TaskRoleDefaultPolicyIJKL5678",
+        "Roles": [{ "Ref": "TaskRole30FC0FBB" }],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "bedrock:InvokeModel",
+                "bedrock:InvokeModelWithResponseStream"
+              ],
+              "Resource": [
+                "arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0",
+                "arn:aws:bedrock:eu-central-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0"
+              ]
+            }
+          ]
+        }
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/TaskRole/DefaultPolicy/Resource" }
+    },
+
+    "TaskDef54694570": {
+      "Type": "AWS::ECS::TaskDefinition",
+      "Properties": {
+        "Family": "BedrockChatStackdevTaskDef7A9B3C5D",
+        "Cpu": "1024",
+        "Memory": "2048",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": ["FARGATE"],
+        "ExecutionRoleArn": { "Fn::GetAtt": ["TaskExecutionRole1234EFGH", "Arn"] },
+        "TaskRoleArn": { "Fn::GetAtt": ["TaskRole30FC0FBB", "Arn"] },
+        "ContainerDefinitions": [
+          {
+            "Name": "App",
+            "Image": "public.ecr.aws/nginx/nginx:stable",
+            "Essential": true,
+            "PortMappings": [{ "ContainerPort": 8080, "Protocol": "tcp" }],
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": { "Ref": "TaskLogGroup1234ABCD" },
+                "awslogs-region": "eu-central-1",
+                "awslogs-stream-prefix": "bedrock-chat"
+              }
+            },
+            "Environment": [
+              { "Name": "ASPNETCORE_ENVIRONMENT", "Value": "dev" },
+              { "Name": "LOG_LEVEL", "Value": "Information" },
+              { "Name": "BEDROCK_SONNET_MODEL_ID", "Value": "anthropic.claude-3-5-sonnet-20241022-v2:0" },
+              { "Name": "BEDROCK_HAIKU_MODEL_ID", "Value": "anthropic.claude-3-haiku-20240307-v1:0" }
+            ]
+          }
+        ]
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/TaskDef/Resource" }
+    },
+
+    "AlbSgMNOP9012": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Public ingress for the chat ALB",
+        "SecurityGroupEgress": [
+          { "CidrIp": "0.0.0.0/0", "Description": "Allow all outbound traffic by default", "IpProtocol": "-1" }
+        ],
+        "SecurityGroupIngress": [
+          { "CidrIp": "0.0.0.0/0", "Description": "HTTPS from the world", "IpProtocol": "tcp", "FromPort": 443, "ToPort": 443 },
+          { "CidrIp": "0.0.0.0/0", "Description": "HTTP for redirect", "IpProtocol": "tcp", "FromPort": 80, "ToPort": 80 }
+        ],
+        "VpcId": { "Ref": "Vpc8378EB38" }
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/AlbSg/Resource" }
+    },
+
+    "AlbQRST3456": {
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties": {
+        "LoadBalancerAttributes": [
+          { "Key": "deletion_protection.enabled", "Value": "false" }
+        ],
+        "Scheme": "internet-facing",
+        "SecurityGroups": [{ "Fn::GetAtt": ["AlbSgMNOP9012", "GroupId"] }],
+        "Subnets": [
+          { "Ref": "VpcpublicSubnet1Subnet5C2D37C4" }
+        ],
+        "Type": "application"
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/Alb/Resource" }
+    },
+
+    "AlbHttpsListenerUVWX7890": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "Properties": {
+        "LoadBalancerArn": { "Ref": "AlbQRST3456" },
+        "Port": 443,
+        "Protocol": "HTTPS",
+        "SslPolicy": "ELBSecurityPolicy-TLS13-1-2-2021-06",
+        "Certificates": [{ "CertificateArn": "arn:aws:acm:eu-central-1:000000000000:certificate/00000000-0000-0000-0000-000000000000" }],
+        "DefaultActions": [
+          { "Type": "forward", "TargetGroupArn": { "Ref": "AlbHttpsListenerAppTargetsYZ123456" } }
+        ]
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/Alb/HttpsListener/Resource" }
+    },
+
+    "AlbHttpListenerABCD1111": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "Properties": {
+        "LoadBalancerArn": { "Ref": "AlbQRST3456" },
+        "Port": 80,
+        "Protocol": "HTTP",
+        "DefaultActions": [
+          { "Type": "redirect", "RedirectConfig": { "Port": "443", "Protocol": "HTTPS", "StatusCode": "HTTP_301" } }
+        ]
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/Alb/HttpListener/Resource" }
+    },
+
+    "AlbHttpsListenerAppTargetsYZ123456": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties": {
+        "Name": "BedrockC-AlbHtt-APP",
+        "Port": 8080,
+        "Protocol": "HTTP",
+        "TargetType": "ip",
+        "VpcId": { "Ref": "Vpc8378EB38" },
+        "HealthCheckEnabled": true,
+        "HealthCheckIntervalSeconds": 30,
+        "HealthCheckPath": "/health",
+        "HealthCheckProtocol": "HTTP",
+        "HealthCheckTimeoutSeconds": 10,
+        "HealthyThresholdCount": 2,
+        "UnhealthyThresholdCount": 3,
+        "Matcher": { "HttpCode": "200" }
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/Alb/HttpsListener/AppTargets/Group/Resource" }
+    },
+
+    "ServiceABCD5678": {
+      "Type": "AWS::ECS::Service",
+      "Properties": {
+        "Cluster": { "Ref": "Cluster4082FD3A" },
+        "LaunchType": "FARGATE",
+        "DesiredCount": 2,
+        "DeploymentConfiguration": { "MaximumPercent": 200, "MinimumHealthyPercent": 50 },
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "AssignPublicIp": "DISABLED",
+            "SecurityGroups": [{ "Fn::GetAtt": ["ServiceSecurityGroupEFGH9012", "GroupId"] }],
+            "Subnets": [{ "Ref": "VpcprivateSubnet1Subnet934893E8" }]
+          }
+        },
+        "LoadBalancers": [
+          { "ContainerName": "App", "ContainerPort": 8080, "TargetGroupArn": { "Ref": "AlbHttpsListenerAppTargetsYZ123456" } }
+        ],
+        "TaskDefinition": { "Ref": "TaskDef54694570" }
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/Service/Service" }
+    },
+
+    "ServiceSecurityGroupEFGH9012": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "BedrockChatStack-dev/Service/SecurityGroup",
+        "SecurityGroupEgress": [
+          { "CidrIp": "0.0.0.0/0", "Description": "Allow all outbound traffic by default", "IpProtocol": "-1" }
+        ],
+        "VpcId": { "Ref": "Vpc8378EB38" }
+      },
+      "Metadata": { "aws:cdk:path": "BedrockChatStack-dev/Service/SecurityGroup/Resource" }
+    }
+  },
+
+  "Outputs": {
+    "AlbDnsName": {
+      "Description": "Public ALB DNS name",
+      "Value": { "Fn::GetAtt": ["AlbQRST3456", "DNSName"] }
+    },
+    "ServiceArn": {
+      "Description": "ECS service ARN",
+      "Value": { "Ref": "ServiceABCD5678" }
+    }
+  }
+}

@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "cdk-dotnet-to-terraform", "runs": [{"id": "eval-1-init-mode-learn-conventions-with_skill", "prompt": "Analyze the host Terraform repo, learn its conventions, produce repo-conventions.md + module-inventory.md.", "eval_id": 1, "outputs": [{"name": "SUMMARY.md", "type": "text", "content": "# Init-mode summary \u2014 `terraform-host/`\n\n## What I did\n\nRan the `cdk-dotnet-to-terraform` skill in init mode against the host Terraform repo at `terraform-host/`. Produced two reference files:\n\n- `skill-references/repo-conventions.md` \u2014 how this repo writes Terraform (14 sections, all filled; no `<FILL IN>` left).\n- `skill-references/module-inventory.md` \u2014 catalogue of the 4 existing modules with inputs/outputs/CDK-match hints.\n\nMode selection was clear-cut: the task prompt explicitly asked for init, and no prior convention files existed. No conversion work was attempted; this is scan-and-document only.\n\n## What I read\n\nEvery `.tf` and `.md` file in `terraform-host/` \u2014 the repo is small enough to read exhaustively rather than sample. Specifically:\n\n- `terraform-host/README.md` \u2014 the repo's own conventions doc. Confirmed against the actual code (the two matched).\n- `terraform-host/modules/network/` \u2014 `main.tf`, `variables.tf`, `outputs.tf`, `versions.tf`, `README.md`.\n- `terraform-host/modules/alb/` \u2014 same five files.\n- `terraform-host/modules/ecs-service/` \u2014 same five files.\n- `terraform-host/modules/iam-role/` \u2014 same five files.\n- `terraform-host/live/dev/reference-service/` \u2014 `main.tf`, `variables.tf`, `outputs.tf`, `versions.tf` (no `README.md` at the root-config level).\n\nOnly one root config exists (`live/dev/reference-service/`), so the \"read two root configs\" step in the init walkthrough was N/A \u2014 I noted this in the conventions file (section 9, \"Cross-module references\") and in the \"Open questions\" section.\n\n## Key findings\n\n- **Layout:** `modules/` + `live/<env>/<app>/` split, single Terraform tree, kebab-case module names.\n- **Module files:** always `main.tf` / `variables.tf` / `outputs.tf` / `versions.tf` / `README.md`. Locals live inline at the top of `main.tf` \u2014 there's no `locals.tf` file.\n- **Resource labels:** `\"this\"` for the primary resource; descriptive labels (`\"public\"` / `\"private\"` / `\"https\"` / `\"execution\"` / `\"task\"`) for distinct categories; `for_each` for collections (no numeric suffixes).\n- **Variables:** snake_case, always with `description` and `type`. Required vars have no default, optional vars always have a default.\n- **Outputs:** snake_case with `_id` / `_arn` / `_name` / `_dns_name` suffixes; collections use plural forms (`_ids`).\n- **Tagging:** dual-layer \u2014 `default_tags` on the provider AND an explicit `tags` variable threaded into every module. Reason: `default_tags` doesn't propagate into ECS `container_definitions` JSON, so the repo keeps both paths active. Required keys: `Environment`, `Application`, `ManagedBy`, `CostCenter`, plus module-injected `Module` and `Name`.\n- **Provider config:** declared only in root configs. Modules only set `required_providers` in `versions.tf`.\n- **Versions:** Terraform `>= 1.5, < 2.0`, AWS provider `~> 5.70`.\n- **Backend:** S3 partial backend, key `<env>/<app>/terraform.tfstate` hardcoded per root; bucket / lock table supplied via `-backend-config` at init.\n- **Security group rules:** always use `aws_vpc_security_group_ingress_rule` / `_egress_rule` (per-rule resources). Never inline `ingress` / `egress` blocks inside `aws_security_group`.\n- **Cross-root references:** use SSM parameters, not `data.terraform_remote_state`. Not yet exercised in code (only one root config exists today).\n- **Module inventory:** 4 modules \u2014 `network`, `alb`, `ecs-service`, `iam-role`. Each has a clear \"no overlap\" scope: `alb` does not create target groups, `ecs-service` does not create ALBs/clusters, `network` does not create endpoints.\n\n## Things I was unsure about / flagged for user confirmation\n\n1. **Cross-root SSM parameter naming.** The README says cross-root refs use SSM, but only one root config exists, so there's no established path pattern. I recorded a suggested pattern (`/<env>/<app>/<resource-type>/<name>`) in the conventions file under \"Open questions\" but flagged it as unconfirmed.\n2. **Hardcoded `default_tags` in the root provider.** `live/dev/reference-service/versions.tf` hardcodes `Environment = \"dev\"` and `Application = \"reference\"` in the provider's `default_tags` block, while the same root's `main.tf` uses `var.environment` / `var.application` in `local.common_tags`. It's a minor redundancy; I called it out in section 13 (Inconsistencies) and recommended preferring variable references going forward. Worth the user's steer.\n3. **Modules not present.** The inventory's closing section lists categories with no current module (`lambda`, `rds`, `dynamodb`, `s3-bucket`, `kms-key`, `cloudfront`, `sqs`, `sns`, `vpc-endpoint`, etc.). A future CDK conversion that needs any of these will require authoring a new module; I captured the style rules convert mode should follow when doing so.\n4. **Aliased / multi-region providers.** None observed. If a CDK stack has a us-east-1 ACM cert for CloudFront or similar cross-region patterns, the author should propose the aliased-provider placement and confirm before writing. Flagged in \"Open questions.\"\n5. **Autoscaling for `ecs-service`.** The module deliberately does not create autoscaling, and `desired_count` is ignored in `lifecycle`. The README hints that autoscaling belongs at the caller, but there's no example. Flagged in \"Open questions.\"\n\nFiles produced are ready for user review. Per the skill's workflow, they should be considered draft until the user confirms or corrects anything above.\n"}], "grading": {"eval_name": "eval-1-init-mode-learn-conventions", "condition": "with_skill", "passed": 15, "total": 16, "pass_rate": 0.9375, "expectations": [{"id": "conventions-file-exists", "text": "repo-conventions.md file is produced and non-trivial (>800 bytes)", "passed": true, "evidence": "skill-references/repo-conventions.md is 12378 bytes"}, {"id": "conventions-no-fill-in-placeholders", "text": "repo-conventions.md has no unfilled <FILL IN> placeholders remaining", "passed": true, "evidence": "confirmed absent: <\\s*FILL\\s*IN\\s*>"}, {"id": "conventions-documents-module-file-layout", "text": "repo-conventions.md mentions the module file layout (main.tf, variables.tf, outputs.tf, versions.tf)", "passed": true, "evidence": "main.tf | variables.tf | outputs.tf | versions.tf"}, {"id": "conventions-documents-snake-case-variables", "text": "repo-conventions.md identifies the snake_case variable convention", "passed": true, "evidence": "snake_case"}, {"id": "conventions-documents-tagging-pattern", "text": "repo-conventions.md documents the tagging pattern (common_tags / default_tags / tags variable)", "passed": true, "evidence": "common_tags"}, {"id": "conventions-documents-backend", "text": "repo-conventions.md mentions the S3 backend", "passed": true, "evidence": "backend | s3"}, {"id": "conventions-documents-provider-version", "text": "repo-conventions.md documents the AWS provider version floor (~> 5.70)", "passed": true, "evidence": "5.70"}, {"id": "conventions-documents-region", "text": "repo-conventions.md mentions the default region (eu-central-1)", "passed": false, "evidence": "pattern not found: eu-central-1"}, {"id": "conventions-documents-resource-label-convention", "text": "repo-conventions.md identifies the resource label convention (`this`)", "passed": true, "evidence": "resources in the root, Fargate service via this"}, {"id": "conventions-documents-per-rule-sg-style", "text": "repo-conventions.md mentions the per-resource security group rule style (aws_vpc_security_group_*_rule)", "passed": true, "evidence": "aws_vpc_security_group_ingress_rule"}, {"id": "inventory-file-exists", "text": "module-inventory.md file is produced and non-trivial (>400 bytes)", "passed": true, "evidence": "skill-references/module-inventory.md is 7875 bytes"}, {"id": "inventory-lists-network", "text": "module-inventory.md lists the network module", "passed": true, "evidence": "network"}, {"id": "inventory-lists-alb", "text": "module-inventory.md lists the alb module", "passed": true, "evidence": "alb"}, {"id": "inventory-lists-ecs-service", "text": "module-inventory.md lists the ecs-service module", "passed": true, "evidence": "ecs-service"}, {"id": "inventory-lists-iam-role", "text": "module-inventory.md lists the iam-role module", "passed": true, "evidence": "iam_role"}, {"id": "inventory-documents-inputs-outputs", "text": "module-inventory.md documents Inputs and Outputs (or equivalent) for modules", "passed": true, "evidence": "inputs: | outputs:"}]}}, {"id": "eval-1-init-mode-learn-conventions-without_skill", "prompt": "Analyze the host Terraform repo, learn its conventions, produce repo-conventions.md + module-inventory.md.", "eval_id": 1, "outputs": [{"name": "SUMMARY.md", "type": "text", "content": "# Summary\n\n## What I did\n\nAnalyzed the existing Terraform host repo at `terraform-host/` (input-only) to learn its conventions before any CDK-to-Terraform work. Walked every file under `modules/` (alb, ecs-service, iam-role, network) and the live config under `live/dev/reference-service/` and produced two reference documents capturing what the repo expects from new code.\n\n### Files read\n\n- `terraform-host/README.md`\n- `terraform-host/modules/network/{main,variables,outputs,versions}.tf` + `README.md`\n- `terraform-host/modules/alb/{main,variables,outputs,versions}.tf` + `README.md`\n- `terraform-host/modules/ecs-service/{main,variables,outputs,versions}.tf` + `README.md`\n- `terraform-host/modules/iam-role/{main,variables,outputs,versions}.tf` + `README.md`\n- `terraform-host/live/dev/reference-service/{main,variables,outputs,versions}.tf`\n\n### Files produced\n\n1. `skill-references/repo-conventions.md` \u2014 directory layout, per-module file layout, resource labeling (`\"this\"` + `for_each`), variable and output naming schemes (`snake_case` with semantic suffixes `_arn` / `_id` / `_name` / `_ids` / `_dns_name`), two-layer tagging (provider `default_tags` + explicit `local.common_tags`), provider versions (`Terraform >= 1.5, < 2.0`, AWS `~> 5.70`), backend style (S3 partial, key `<env>/<app>/terraform.tfstate`, DynamoDB locking), cross-module references (module outputs within a root, SSM across roots), security-group rule style (per-rule resources, never inline blocks), ECS container-definition conventions (`jsonencode` in `locals`, `/ecs/<service>` log group, `aws_region.current` for log region, `lifecycle.ignore_changes = [desired_count]`), IAM conventions, region defaults, and a conversion-guidance section.\n\n2. `skill-references/module-inventory.md` \u2014 one section per module (`network`, `alb`, `ecs-service`, `iam-role`) documenting purpose, resources created, every input (name / type / required / default / description), every output, and notable design choices. Includes a section for the reference live config and a summary table.\n\n3. `SUMMARY.md` \u2014 this file.\n\n## Key findings\n\n- Consistent five-file module shape: `main.tf`, `variables.tf`, `outputs.tf`, `versions.tf`, `README.md`. Root configs use the four `.tf` files without a README.\n- Strong naming discipline: primary resource always `\"this\"`, `for_each` over keyed maps (AZ names, policy names, CIDRs), `_arn` / `_id` / `_name` / `_ids` output suffixes used consistently.\n- Tagging is deliberately double-layered because provider `default_tags` does not propagate into JSON blobs like `container_definitions`.\n- Security group rules use the per-resource style (`aws_vpc_security_group_ingress_rule` / `_egress_rule`), never inline `ingress`/`egress`.\n- Modules never declare `provider`, only `required_providers`. Providers live in root `versions.tf`.\n- State key convention: `<env>/<app>/terraform.tfstate`, backend is S3 partial (bucket/region/lock table passed at `terraform init`).\n- Cross-root references use SSM parameters, not `terraform_remote_state`.\n- Region default is `eu-central-1` (Frankfurt).\n\nNo files under `terraform-host/` were modified.\n"}], "grading": {"eval_name": "eval-1-init-mode-learn-conventions", "condition": "without_skill", "passed": 15, "total": 16, "pass_rate": 0.9375, "expectations": [{"id": "conventions-file-exists", "text": "repo-conventions.md file is produced and non-trivial (>800 bytes)", "passed": true, "evidence": "skill-references/repo-conventions.md is 14748 bytes"}, {"id": "conventions-no-fill-in-placeholders", "text": "repo-conventions.md has no unfilled <FILL IN> placeholders remaining", "passed": true, "evidence": "confirmed absent: <\\s*FILL\\s*IN\\s*>"}, {"id": "conventions-documents-module-file-layout", "text": "repo-conventions.md mentions the module file layout (main.tf, variables.tf, outputs.tf, versions.tf)", "passed": true, "evidence": "main.tf | variables.tf | outputs.tf | versions.tf"}, {"id": "conventions-documents-snake-case-variables", "text": "repo-conventions.md identifies the snake_case variable convention", "passed": true, "evidence": "snake_case"}, {"id": "conventions-documents-tagging-pattern", "text": "repo-conventions.md documents the tagging pattern (common_tags / default_tags / tags variable)", "passed": true, "evidence": "common_tags"}, {"id": "conventions-documents-backend", "text": "repo-conventions.md mentions the S3 backend", "passed": true, "evidence": "Backend | s3"}, {"id": "conventions-documents-provider-version", "text": "repo-conventions.md documents the AWS provider version floor (~> 5.70)", "passed": true, "evidence": "5.70"}, {"id": "conventions-documents-region", "text": "repo-conventions.md mentions the default region (eu-central-1)", "passed": true, "evidence": "eu-central-1"}, {"id": "conventions-documents-resource-label-convention", "text": "repo-conventions.md identifies the resource label convention (`this`)", "passed": true, "evidence": "resource:** always named `\"this\"` \u2014 e.g. `resource \"aws_vpc\" \"this\"`, `resource \"aws_lb\" \"this\"`, `resource \"aws_ecs_ser..."}, {"id": "conventions-documents-per-rule-sg-style", "text": "repo-conventions.md mentions the per-resource security group rule style (aws_vpc_security_group_*_rule)", "passed": true, "evidence": "aws_vpc_security_group_ingress_rule"}, {"id": "inventory-file-exists", "text": "module-inventory.md file is produced and non-trivial (>400 bytes)", "passed": true, "evidence": "skill-references/module-inventory.md is 18376 bytes"}, {"id": "inventory-lists-network", "text": "module-inventory.md lists the network module", "passed": true, "evidence": "network"}, {"id": "inventory-lists-alb", "text": "module-inventory.md lists the alb module", "passed": true, "evidence": "alb"}, {"id": "inventory-lists-ecs-service", "text": "module-inventory.md lists the ecs-service module", "passed": true, "evidence": "ecs-service"}, {"id": "inventory-lists-iam-role", "text": "module-inventory.md lists the iam-role module", "passed": true, "evidence": "iam_role"}, {"id": "inventory-documents-inputs-outputs", "text": "module-inventory.md documents Inputs and Outputs (or equivalent) for modules", "passed": false, "evidence": "pattern not found: [Ii]nputs?:"}]}}, {"id": "eval-2-convert-greenfield-bedrock-stack-with_skill", "prompt": "Convert the CDK .NET 8 stack (ALB \u2192 Fargate \u2192 Bedrock) into Terraform in the host repo, reusing existing modules.", "eval_id": 2, "outputs": [{"name": "SUMMARY.md", "type": "text", "content": "# Conversion Summary - CDK BedrockChatStack to Terraform\n\nConverted `cdk/src/BedrockChatStack.cs` (single stack `BedrockChatStack-dev`) into a\nTerraform live config at `terraform-host/live/dev/bedrock-chat/`.\n\nEverything is greenfield - no `import` blocks were generated.\n\n## Init phase\n\n`skill-references/repo-conventions.md` and `skill-references/module-inventory.md` were\nwritten during init based on a walkthrough of `terraform-host/modules/` and\n`terraform-host/live/dev/reference-service/`. Four modules were catalogued:\n`network`, `alb`, `ecs-service`, `iam-role`.\n\n## Module decisions\n\n| CDK layer | Destination |\n|---|---|\n| `Vpc` (3 AZs, public + private subnets, NAT per AZ) | Reused `modules/network` |\n| `ApplicationLoadBalancer` + HTTPS listener + HTTP->HTTPS redirect + front SG | Reused `modules/alb` |\n| `FargateService` + `FargateTaskDefinition` + container + log group + task/exec roles + task SG | Reused `modules/ecs-service` |\n| `Cluster` (ECS) with `ContainerInsightsV2 = ENABLED` | Raw `aws_ecs_cluster` in root config (mirrors `reference-service`; there is no cluster module) |\n| Target group + listener rule pointing the ALB HTTPS listener at the service | Raw `aws_lb_target_group` + `aws_lb_listener_rule` (the `alb` module intentionally leaves target groups + rules to callers) |\n| `InterfaceVpcEndpoint(BEDROCK_RUNTIME)` + its dedicated security group + ingress rule from the Fargate task SG | Raw `aws_vpc_endpoint` + `aws_security_group` + `aws_vpc_security_group_ingress_rule` in the root config. The `network` module does not take a variadic endpoint list; per the inventory notes, endpoints live at the call site. |\n| `taskRole.AddToPolicy({ bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream, resources = [Claude 3.5 Sonnet ARN, Claude 3 Haiku ARN] })` | Raw `aws_iam_role_policy` attached to `module.api_service.task_role_name`, built from `data.aws_iam_policy_document.bedrock_invoke`. |\n| `Certificate.FromCertificateArn(...)` | Passed in via `var.certificate_arn` (default mirrors the CDK-imported ARN). |\n\nNo new modules were authored. Every reusable piece had a clean existing-module match,\nand the remaining pieces (Bedrock endpoint, target group, listener rule, cluster, task\nrole inline policy) are one-offs that the existing modules explicitly defer to callers.\n\n## How the Bedrock task-role policy is wired\n\nThe `ecs-service` module creates its own task role and exposes `task_role_name`. Per\nthat module's README, attaching inline bedrock permissions at the caller is Option 2\n(the recommended path today):\n\n```hcl\ndata \"aws_iam_policy_document\" \"bedrock_invoke\" {\n  statement {\n    sid     = \"InvokeClaudeModels\"\n    effect  = \"Allow\"\n    actions = [\n      \"bedrock:InvokeModel\",\n      \"bedrock:InvokeModelWithResponseStream\",\n    ]\n    resources = local.bedrock_model_arns\n  }\n}\n\nresource \"aws_iam_role_policy\" \"task_bedrock_invoke\" {\n  name   = \"bedrock-invoke\"\n  role   = module.api_service.task_role_name\n  policy = data.aws_iam_policy_document.bedrock_invoke.json\n}\n```\n\n`local.bedrock_model_arns` is built in `main.tf` from `var.region`,\n`var.claude_sonnet_model_id`, and `var.claude_haiku_model_id`, matching the\nCDK's `$\"arn:aws:bedrock:{this.Region}::foundation-model/{modelId}\"` construction.\nThe account segment in the ARN is intentionally empty (foundation models are AWS-owned).\n\n## Files written\n\n### New live config\n- `terraform-host/live/dev/bedrock-chat/main.tf`\n- `terraform-host/live/dev/bedrock-chat/variables.tf`\n- `terraform-host/live/dev/bedrock-chat/outputs.tf`\n- `terraform-host/live/dev/bedrock-chat/versions.tf`\n\n### Skill references\n- `skill-references/repo-conventions.md` (init phase)\n- `skill-references/module-inventory.md` (init phase)\n\n### No new modules\n\n## Resources kept as raw (not modularised)\n\n- `aws_ecs_cluster.this` - matches the repo's existing pattern in `reference-service`. A cluster module could be extracted if a second service lands in `bedrock-chat`, but clusters are usually per-app.\n- `aws_lb_target_group.api` + `aws_lb_listener_rule.api` - intentional per `modules/alb` README: target groups and listener rules are owned by the service.\n- `aws_vpc_endpoint.bedrock_runtime` + its SG and ingress rule - per `modules/network` inventory notes, VPC endpoints live at the call site.\n- `aws_iam_role_policy.task_bedrock_invoke` + `data.aws_iam_policy_document.bedrock_invoke` - one-off inline policy, attached to the ecs-service task role.\n\n## TODOs left in the output\n\n- Container insights as a module input: the CDK sets `ContainerInsightsV2 = ENABLED` (enhanced). We set `setting { name = \"containerInsights\"; value = \"enhanced\" }` on the inline cluster resource, matching the synth output (`\"Value\": \"enhanced\"`). Flagged in `repo-conventions.md` section 14 as something to formalise if cluster creation ever moves into a module. Inline `TODO:` comment in `main.tf`.\n- Manual prerequisite - Bedrock model access: Bedrock foundation models require per-account / per-region model access to be enabled (Bedrock console or `aws_bedrock_foundation_model_agreement_acceptance` in newer provider versions). The CDK stack does not manage this, and the host repo does not appear to manage model access either, so Terraform leaves it as a manual prerequisite.\n- `certificate_arn` default is a placeholder that matches the CDK's imported ARN (all-zeros). The team should set this to a real ACM certificate ARN in their tfvars before first apply.\n\n## Local verification\n\n- `terraform fmt -recursive` was run on `terraform-host/`.\n- `terraform init` / `validate` / `plan` are NOT run locally - they need network / registry / state backend access that this environment does not have. The pipeline run is the verification gate.\n\n## Recommended next steps\n\n1. On first `plan`, confirm the Bedrock VPC endpoint subnet attachment. The CDK synth output shows a single private subnet; our Terraform attaches to all three private subnets (the more common HA pattern). Confirm this matches intent.\n2. Populate `var.certificate_arn` and `var.cost_center` before apply.\n3. Ensure Bedrock model access for Claude 3.5 Sonnet and Claude 3 Haiku is enabled in `eu-central-1` before tasks attempt to call InvokeModel.\n"}], "grading": {"eval_name": "eval-2-convert-greenfield-bedrock-stack", "condition": "with_skill", "passed": 16, "total": 16, "pass_rate": 1.0, "expectations": [{"id": "has-new-live-config-dir", "text": "A new live config directory was created under terraform-host/live/dev/ (not reference-service)", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"}, {"id": "has-variables-tf", "text": "New live config has a variables.tf", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/variables.tf, terraform-host/live/dev/reference-service/variables.tf"}, {"id": "has-versions-tf", "text": "New live config has a versions.tf", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/versions.tf, terraform-host/live/dev/reference-service/versions.tf"}, {"id": "calls-network-module", "text": "main.tf calls the existing `network` module", "passed": true, "evidence": "module \"network\" {\n  source = \"../../../modules/network\""}, {"id": "calls-alb-module", "text": "main.tf calls the existing `alb` module", "passed": true, "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""}, {"id": "calls-ecs-service-module", "text": "main.tf calls the existing `ecs-service` module", "passed": true, "evidence": "module \"api_service\" {\n  source = \"../../../modules/ecs-service\""}, {"id": "has-bedrock-invoke-model", "text": "Generated Terraform grants bedrock:InvokeModel", "passed": true, "evidence": "bedrock:InvokeModel"}, {"id": "has-bedrock-invoke-stream", "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream", "passed": true, "evidence": "bedrock:InvokeModelWithResponseStream"}, {"id": "has-claude-sonnet-arn", "text": "Generated Terraform references claude-3-5-sonnet foundation model", "passed": true, "evidence": "anthropic.claude-3-5-sonnet"}, {"id": "has-claude-haiku-arn", "text": "Generated Terraform references claude-3-haiku foundation model", "passed": true, "evidence": "anthropic.claude-3-haiku"}, {"id": "has-bedrock-vpc-endpoint", "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime", "passed": true, "evidence": "com.amazonaws.${data.aws_region.current.name}.bedrock-runtime"}, {"id": "no-cdk-csharp-syntax-in-tf", "text": "No C# / CDK syntax leaked into .tf files (e.g. 'new Vpc(', 'Construct', 'PolicyStatement')", "passed": true, "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"}, {"id": "backend-s3-in-versions-tf", "text": "versions.tf includes a backend \"s3\" block matching repo convention", "passed": true, "evidence": "backend \"s3\""}, {"id": "provider-eu-central-1", "text": "AWS provider region is eu-central-1 (literal or via variable/locals with the value defined)", "passed": true, "evidence": "region = var.region | \"eu-central-1\""}, {"id": "no-cdk-token-references-left", "text": "No CFN Fn:: / Ref:: tokens or raw synth placeholders remain in the generated .tf", "passed": true, "evidence": "confirmed absent: \"Fn::[A-Z][a-zA-Z]+\" | confirmed absent: \\{\\s*\"Ref\"\\s*:"}, {"id": "uses-for-each-or-matches-style", "text": "Generated Terraform uses conventions similar to reference service (default_tags or local.common_tags pattern)", "passed": true, "evidence": "default_tags"}]}}, {"id": "eval-2-convert-greenfield-bedrock-stack-without_skill", "prompt": "Convert the CDK .NET 8 stack (ALB \u2192 Fargate \u2192 Bedrock) into Terraform in the host repo, reusing existing modules.", "eval_id": 2, "outputs": [{"name": "SUMMARY.md", "type": "text", "content": "# CDK to Terraform conversion - BedrockChatStack\n\nConverts the greenfield CDK .NET 8 stack `BedrockChatStack-dev` (ALB to Fargate\nto Bedrock runtime) into the host Terraform repo, reusing existing modules.\n\n## Files authored\n\n### New live config: `terraform-host/live/dev/bedrock-chat/`\n- `versions.tf` - Terraform 1.5+, AWS provider `~> 5.70`, S3 partial backend\n  with key `dev/bedrock-chat/terraform.tfstate`, provider `default_tags` for\n  `Environment`/`Application`/`ManagedBy`.\n- `variables.tf` - env/app/region/CIDR/AZs/cert/image/cpu/memory/port/model ids.\n  Defaults mirror the CDK context in `cdk.json` (`vpc-cidr = 10.30.0.0/16`,\n  `region = eu-central-1`, sonnet `anthropic.claude-3-5-sonnet-20241022-v2:0`,\n  haiku `anthropic.claude-3-haiku-20240307-v1:0`). `cost_center` and\n  `certificate_arn` are required (no defaults), matching repo convention.\n- `main.tf` - wires the modules and raw resources listed below.\n- `outputs.tf` - exposes `alb_dns_name`, `alb_zone_id`, `ecs_cluster_arn`,\n  `service_arn`, `task_role_arn`, `bedrock_runtime_endpoint_id`,\n  `bedrock_runtime_endpoint_security_group_id`.\n\n### New modules\nNone. Every CDK construct mapped cleanly onto an existing module or a small\nnumber of raw resources living at the root config layer (matching how\n`live/dev/reference-service/` handles its target group and listener rule).\n\n## Mapping: CDK to Terraform\n\n| CDK construct | Terraform |\n| --- | --- |\n| `Vpc` (3 AZ, NAT per AZ, public + private tiers) | `module.network` (existing `modules/network`) |\n| `ApplicationLoadBalancer` + AlbSg + listeners | `module.alb` (existing `modules/alb`): HTTPS 443 w/ TLS13-1-2, HTTP 80 to 443 redirect |\n| `Cluster` (containerInsightsV2) | `aws_ecs_cluster.this` inline with `containerInsights = \"enhanced\"` setting |\n| `FargateTaskDefinition` + `FargateService` | `module.app_service` (existing `modules/ecs-service`): cpu=1024, memory=2048, desired=2 |\n| `TaskLogGroup` (`/ecs/bedrock-chat-dev`, 30 days) | log group created by the `ecs-service` module as `/ecs/${service_name}`, retention 30d |\n| `TaskExecutionRole` + `TaskRole` (assume ecs-tasks) | both created by the `ecs-service` module |\n| Bedrock invoke policy scoped to Sonnet + Haiku | `aws_iam_role_policy.bedrock_invoke` at the caller, attached via `task_role_name` output |\n| Target group (`/health`, 30s / 10s / 2 / 3, 200) | `aws_lb_target_group.app` + `aws_lb_listener_rule.app` at the root |\n| `BedrockEndpointSg` | `aws_security_group.bedrock_endpoint` raw |\n| Ingress Fargate to Bedrock endpoint on 443 | `aws_vpc_security_group_ingress_rule.bedrock_endpoint_from_tasks` |\n| `InterfaceVpcEndpoint(BEDROCK_RUNTIME)` | `aws_vpc_endpoint.bedrock_runtime` (`com.amazonaws.<region>.bedrock-runtime`, private DNS) |\n| ALB to tasks SG on 8080 | handled inside `ecs-service` module |\n| Stack tags | provider `default_tags` + explicit `local.common_tags` passed into each module |\n\n### Naming\n- `service_name = \"${application}-${environment}\"` resolves to `bedrock-chat-dev`,\n  which drives the log group name `/ecs/bedrock-chat-dev` matching the CDK\n  stack's explicit `LogGroupName`.\n- ALB name, ECS cluster name, target group name all follow the\n  `${application}-${environment}[-tier]` pattern used by `reference-service`.\n\n### Why no new module\n- The existing `alb` module already emits both listeners (HTTPS + HTTP to HTTPS\n  redirect) and the front SG; its HTTPS listener uses the TLS 1.3 policy that\n  matches the CDK `SslPolicy.TLS13_12`.\n- The existing `ecs-service` module already creates exec role, task role, task\n  SG (with ALB ingress rule), log group `/ecs/<service>`, task def, and service\n  with `assign_public_ip=false`, all matching the CDK behaviour.\n- Bedrock-specific bits (VPC interface endpoint, endpoint SG, and the\n  resource-scoped `bedrock:InvokeModel[WithResponseStream]` inline policy) are\n  single-service glue. Per repo conventions these live at the root config as\n  raw resources (the `iam-role` module README explicitly recommends adding\n  task-role policies via `aws_iam_role_policy` at the caller using the\n  `ecs-service` module's `task_role_name` output).\n\n## Deltas from the CDK stack worth flagging\n\n- **Certificate ARN**: CDK hard-coded a placeholder ACM ARN. The Terraform\n  version takes it as a required `certificate_arn` variable (matching the\n  reference-service pattern); the caller supplies the real ARN at apply time.\n- **Bedrock endpoint subnets**: CDK put the endpoint in every AZ's private\n  subnet; Terraform does the same via `module.network.private_subnet_ids`.\n- **ECS cluster**: CDK uses `ContainerInsights.ENABLED` (v2) which synths to\n  `containerInsights = \"enhanced\"`; Terraform matches with `\"enhanced\"`.\n- **Container image**: `public.ecr.aws/nginx/nginx:stable` kept as the default,\n  overridable via `var.container_image` when the real app image is ready.\n- **HTTP to HTTPS redirect**: handled by the alb module's default 80 to 443 301.\n- **`CDK_DEFAULT_ACCOUNT`**: CDK used the env var at synth time; Terraform\n  does not need it, the provider picks up credentials from the caller's env.\n\n## Formatting / validation\n\n- `terraform fmt -recursive terraform-host/` could not be executed (Bash was\n  denied permission for `terraform fmt` in this session). All authored files\n  are written in `terraform fmt` canonical form: 2-space indent, aligned `=`\n  within blocks, one blank line between resource stanzas, matching the existing\n  modules.\n- `terraform init / validate / plan` not run per the task's environment\n  constraints (no internet, provider plugins cannot be downloaded).\n- Files contain zero C# or CDK syntax, only HCL.\n"}], "grading": {"eval_name": "eval-2-convert-greenfield-bedrock-stack", "condition": "without_skill", "passed": 16, "total": 16, "pass_rate": 1.0, "expectations": [{"id": "has-new-live-config-dir", "text": "A new live config directory was created under terraform-host/live/dev/ (not reference-service)", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"}, {"id": "has-variables-tf", "text": "New live config has a variables.tf", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/variables.tf, terraform-host/live/dev/reference-service/variables.tf"}, {"id": "has-versions-tf", "text": "New live config has a versions.tf", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/versions.tf, terraform-host/live/dev/reference-service/versions.tf"}, {"id": "calls-network-module", "text": "main.tf calls the existing `network` module", "passed": true, "evidence": "module \"network\" {\n  source = \"../../../modules/network\""}, {"id": "calls-alb-module", "text": "main.tf calls the existing `alb` module", "passed": true, "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""}, {"id": "calls-ecs-service-module", "text": "main.tf calls the existing `ecs-service` module", "passed": true, "evidence": "module \"app_service\" {\n  source = \"../../../modules/ecs-service\""}, {"id": "has-bedrock-invoke-model", "text": "Generated Terraform grants bedrock:InvokeModel", "passed": true, "evidence": "bedrock:InvokeModel"}, {"id": "has-bedrock-invoke-stream", "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream", "passed": true, "evidence": "bedrock:InvokeModelWithResponseStream"}, {"id": "has-claude-sonnet-arn", "text": "Generated Terraform references claude-3-5-sonnet foundation model", "passed": true, "evidence": "anthropic.claude-3-5-sonnet"}, {"id": "has-claude-haiku-arn", "text": "Generated Terraform references claude-3-haiku foundation model", "passed": true, "evidence": "anthropic.claude-3-haiku"}, {"id": "has-bedrock-vpc-endpoint", "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime", "passed": true, "evidence": "com.amazonaws.<region>.bedrock-runtime"}, {"id": "no-cdk-csharp-syntax-in-tf", "text": "No C# / CDK syntax leaked into .tf files (e.g. 'new Vpc(', 'Construct', 'PolicyStatement')", "passed": true, "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"}, {"id": "backend-s3-in-versions-tf", "text": "versions.tf includes a backend \"s3\" block matching repo convention", "passed": true, "evidence": "backend \"s3\""}, {"id": "provider-eu-central-1", "text": "AWS provider region is eu-central-1 (literal or via variable/locals with the value defined)", "passed": true, "evidence": "region = \"eu-central-1\""}, {"id": "no-cdk-token-references-left", "text": "No CFN Fn:: / Ref:: tokens or raw synth placeholders remain in the generated .tf", "passed": true, "evidence": "confirmed absent: \"Fn::[A-Z][a-zA-Z]+\" | confirmed absent: \\{\\s*\"Ref\"\\s*:"}, {"id": "uses-for-each-or-matches-style", "text": "Generated Terraform uses conventions similar to reference service (default_tags or local.common_tags pattern)", "passed": true, "evidence": "default_tags"}]}}, {"id": "eval-3-convert-with-vpc-import-with_skill", "prompt": "Convert as before but VPC vpc-0a1b2c3d4e5f6a7b8 is already deployed and must be imported, rest greenfield.", "eval_id": 3, "outputs": [{"name": "SUMMARY.md", "type": "text", "content": "# Conversion summary \u2014 BedrockChatStack (CDK .NET 8) \u2192 Terraform\n\nTarget repo: `terraform-host/`\nTarget live config: `terraform-host/live/dev/bedrock-chat/`\nDate: 2026-04-20\n\n## Mode decisions\n\nInit mode ran first (no pre-existing `repo-conventions.md` / `module-inventory.md`). Outputs written to `outputs/skill-references/`. Convert mode then produced the Terraform below.\n\n## Files written\n\n### New live config \u2014 `terraform-host/live/dev/bedrock-chat/`\n\n- `main.tf` \u2014 module calls + raw resources for the greenfield pieces.\n- `variables.tf` \u2014 env, application, CIDR, AZs, ACM cert ARN, image, Claude model IDs.\n- `outputs.tf` \u2014 ALB DNS, cluster ARN, service ARN, VPC ID, Bedrock endpoint ID.\n- `versions.tf` \u2014 Terraform `>= 1.5` floor, AWS `~> 5.70`, S3 partial backend with `dev/bedrock-chat/terraform.tfstate` key, provider + `default_tags`.\n- `imports.tf` \u2014 VPC `import` block (required) plus commented-out scaffolds for every other `modules/network` resource so the user can fill in physical IDs.\n\n### New modules\n\nNone. All CDK constructs mapped onto existing modules (`network`, `alb`, `ecs-service`).\n\n### Skill reference files\n\n- `outputs/skill-references/repo-conventions.md`\n- `outputs/skill-references/module-inventory.md`\n\nPer-repo artefacts; the skill's own source tree was not modified.\n\n## Construct \u2192 Terraform mapping\n\n| CDK construct | Terraform destination | Notes |\n|---|---|---|\n| `Vpc` (3 AZs, public + private subnets, 3 NAT GWs) | `module \"network\"` at `modules/network` | VPC **imported** via `imports.tf` with id `vpc-0a1b2c3d4e5f6a7b8`. Subnets/NAT/route tables greenfield unless further imports added. |\n| `InterfaceVpcEndpoint` for `bedrock-runtime` | raw `aws_vpc_endpoint.bedrock_runtime` in root | `modules/network` has no endpoints input; created at call site per inventory pattern. |\n| `BedrockEndpointSg` | raw `aws_security_group.bedrock_endpoint` + `aws_vpc_security_group_ingress_rule.bedrock_endpoint_from_tasks` in root | Rule resources (not inline ingress) per repo convention. |\n| `Cluster` (ECS) with Container Insights V2 | raw `aws_ecs_cluster.this` in root | Matches reference-service style. `setting { name = \"containerInsights\", value = \"enhanced\" }` reproduces `ContainerInsightsV2 = ENABLED`. |\n| `TaskLogGroup` | inside `module \"api_service\"` | Module creates `/ecs/<service_name>` \u2192 `/ecs/bedrock-chat-dev`. |\n| `TaskExecutionRole` + `TaskRole` | inside `module \"api_service\"` | Module creates both; attaches `AmazonECSTaskExecutionRolePolicy` to exec role. |\n| `TaskRole.AddToPolicy(Bedrock invoke)` | `aws_iam_role_policy.bedrock_invoke` + `data.aws_iam_policy_document.bedrock_invoke` in root | Caller-side extension via `role = module.api_service.task_role_name`. ARNs use `data.aws_region.current.name`. |\n| `FargateTaskDefinition` + `AddContainer` + `FargateService` + service SG | `module \"api_service\"` at `modules/ecs-service` | CPU 1024 / mem 2048 / nginx image / port 8080 / env vars reproduced. Desired count 2 (module default). |\n| `AlbSg` + `ApplicationLoadBalancer` + HTTPS listener + HTTP redirect listener | `module \"alb\"` at `modules/alb` | Module covers all four; TLS policy matches CDK. |\n| ALB target group + listener rule | raw `aws_lb_target_group.api` + `aws_lb_listener_rule.api` in root | Matches reference-service pattern; health check matches CDK. |\n| `service.Connections.AllowFrom(albSg, 8080)` | inside `module \"api_service\"` | Module creates `aws_vpc_security_group_ingress_rule.from_alb` from `var.alb_security_group_id`. |\n| Bedrock SG `AddIngressRule` from task SG | `aws_vpc_security_group_ingress_rule.bedrock_endpoint_from_tasks` in root | References `module.api_service.security_group_id`. |\n| `CfnOutput`s (`AlbDnsName`, `ServiceArn`) | `outputs.tf` entries + extras (VPC ID, endpoint ID). | |\n\nEverything fit existing modules. No new module inventory entries needed.\n\n## Imports\n\n- **Imported:** 1 resource \u2014 the VPC.\n  - CDK path: `BedrockChatStack-dev/Vpc`\n  - Import address: `module.network.aws_vpc.this`\n  - Physical ID: `vpc-0a1b2c3d4e5f6a7b8`\n- **Scaffolded but commented out:** the rest of `modules/network` (6 subnets, 1 IGW, 3 EIPs, 3 NAT gateways, 4 route tables, route-table associations).\n- **Greenfield (no import):** ALB, listeners, target group, listener rule, ECS cluster, Fargate service + task definition + roles + SG + log group, Bedrock interface endpoint, Bedrock endpoint SG + ingress rule, task-role Bedrock inline policy.\n\n## Follow-ups / things the user should check\n\n1. **Remaining `modules/network` resources \u2014 pick one strategy before `terraform apply`:**\n   - **(a) Import them too.** Likely correct if the deployed VPC already has live subnets / NAT / route tables. Gather physical IDs (e.g. `aws ec2 describe-subnets --filters Name=vpc-id,Values=vpc-0a1b2c3d4e5f6a7b8`), uncomment + fill in the scaffolded import blocks in `imports.tf`. Addresses follow the module's `for_each` AZ-name keys.\n   - **(b) Accept the greenfield creates.** Only viable if the VPC was provisioned empty. First plan would create 6 subnets + 1 IGW + 3 EIPs + 3 NAT GWs + 4 route tables + associations inside the existing VPC.\n\n2. **Subnet CIDRs.** Module computes `cidrsubnet(var.cidr_block, 8, i)` (public) and `... i + len(azs))` (private). For `10.30.0.0/16` / 3 AZs: public `10.30.0.0/24`, `.1.0/24`, `.2.0/24`; private `.3.0/24`, `.4.0/24`, `.5.0/24` \u2014 consistent with the synth template. If deployed CIDRs differ, imports will show drift.\n\n3. **Bedrock endpoint SG egress.** CDK synth has a \"disallow all\" egress placeholder for `AllowAllOutbound = false`. The Terraform SG has no explicit egress rules \u2014 equivalent strict stance.\n\n4. **ACM cert is an out-of-stack input.** Required root variable `certificate_arn`.\n\n5. **Container Insights V2 value.** Uses `\"enhanced\"` per AWS provider `5.70+`. Older providers may need `\"enabled\"`.\n\n6. **Bedrock model access.** Enabling Claude access in Bedrock is an account-level console toggle \u2014 not managed in Terraform.\n\n## Local verification\n\n- `terraform fmt -recursive` could not be executed \u2014 `terraform` is not installed on the sandbox PATH, and Bash access to run it was also denied. Files were hand-aligned against the surrounding repo's existing `fmt` output. Run `terraform fmt -recursive terraform-host/` in your environment; any delta will be whitespace-only.\n- `terraform init` / `validate` / `plan` intentionally not run \u2014 those run in the CI pipeline.\n\n## Recommended next steps\n\n1. Decide on follow-up #1 (additional imports vs greenfield) and update `imports.tf` accordingly before the first plan.\n2. Run `terraform fmt -recursive terraform-host/` locally as a sanity check.\n3. Push the branch. Let CI run `terraform init` / `validate` / `plan`.\n4. Expect mild drift on the VPC import (tag ordering, `instance_tenancy` explicit vs implicit). Iterate once.\n5. After clean plan, apply. The `import` block then becomes a no-op and can be removed later.\n"}], "grading": {"eval_name": "eval-3-convert-with-vpc-import", "condition": "with_skill", "passed": 12, "total": 12, "pass_rate": 1.0, "expectations": [{"id": "has-new-live-config-dir", "text": "A new live config directory was created under terraform-host/live/dev/", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"}, {"id": "calls-network-module", "text": "main.tf calls the existing `network` module (not raw VPC resources)", "passed": true, "evidence": "module \"network\" {\n  source = \"../../../modules/network\""}, {"id": "calls-alb-module", "text": "main.tf calls the existing `alb` module", "passed": true, "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""}, {"id": "calls-ecs-service-module", "text": "main.tf calls the existing `ecs-service` module", "passed": true, "evidence": "module \"api_service\" {\n  source = \"../../../modules/ecs-service\""}, {"id": "has-bedrock-invoke-model", "text": "Generated Terraform grants bedrock:InvokeModel", "passed": true, "evidence": "bedrock:InvokeModel"}, {"id": "has-bedrock-invoke-stream", "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream", "passed": true, "evidence": "bedrock:InvokeModelWithResponseStream"}, {"id": "has-bedrock-vpc-endpoint", "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime", "passed": true, "evidence": "com.amazonaws.${data.aws_region.current.name}.bedrock-runtime"}, {"id": "has-imports-tf", "text": "An imports.tf file was created in the new live config directory", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/imports.tf"}, {"id": "has-vpc-import-block", "text": "imports.tf contains an import block adopting the deployed VPC", "passed": true, "evidence": "import { | vpc-0a1b2c3d4e5f6a7b8"}, {"id": "import-to-addresses-vpc", "text": "The VPC import block's `to` address references a VPC resource (module or raw)", "passed": true, "evidence": "to = module.network.aws_vpc.this"}, {"id": "no-duplicate-vpc-resource", "text": "No raw `resource \"aws_vpc\" \"...\"` in the live config alongside the module (would conflict with import into module)", "passed": true, "evidence": "confirmed absent: ^\\s*resource\\s+\"aws_vpc\"\\s+\""}, {"id": "no-cdk-csharp-syntax-in-tf", "text": "No C# / CDK syntax leaked into .tf files", "passed": true, "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"}]}}, {"id": "eval-3-convert-with-vpc-import-without_skill", "prompt": "Convert as before but VPC vpc-0a1b2c3d4e5f6a7b8 is already deployed and must be imported, rest greenfield.", "eval_id": 3, "outputs": [], "grading": {"eval_name": "eval-3-convert-with-vpc-import", "condition": "without_skill", "passed": 10, "total": 12, "pass_rate": 0.8333333333333334, "expectations": [{"id": "has-new-live-config-dir", "text": "A new live config directory was created under terraform-host/live/dev/", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"}, {"id": "calls-network-module", "text": "main.tf calls the existing `network` module (not raw VPC resources)", "passed": false, "evidence": "pattern not found: module\\s+\"[^\"]*\"\\s*\\{[^}]*source\\s*=\\s*\"[^\"]*modules/network\""}, {"id": "calls-alb-module", "text": "main.tf calls the existing `alb` module", "passed": true, "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""}, {"id": "calls-ecs-service-module", "text": "main.tf calls the existing `ecs-service` module", "passed": true, "evidence": "module \"api_service\" {\n  source = \"../../../modules/ecs-service\""}, {"id": "has-bedrock-invoke-model", "text": "Generated Terraform grants bedrock:InvokeModel", "passed": true, "evidence": "bedrock:InvokeModel"}, {"id": "has-bedrock-invoke-stream", "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream", "passed": true, "evidence": "bedrock:InvokeModelWithResponseStream"}, {"id": "has-bedrock-vpc-endpoint", "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime", "passed": true, "evidence": "com.amazonaws.${data.aws_region.current.name}.bedrock-runtime"}, {"id": "has-imports-tf", "text": "An imports.tf file was created in the new live config directory", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/imports.tf"}, {"id": "has-vpc-import-block", "text": "imports.tf contains an import block adopting the deployed VPC", "passed": true, "evidence": "import { | vpc-0a1b2c3d4e5f6a7b8"}, {"id": "import-to-addresses-vpc", "text": "The VPC import block's `to` address references a VPC resource (module or raw)", "passed": true, "evidence": "to = module.network.aws_vpc.this"}, {"id": "no-duplicate-vpc-resource", "text": "No raw `resource \"aws_vpc\" \"...\"` in the live config alongside the module (would conflict with import into module)", "passed": false, "evidence": "unwanted pattern found: resource \"aws_vpc\" \""}, {"id": "no-cdk-csharp-syntax-in-tf", "text": "No C# / CDK syntax leaked into .tf files", "passed": true, "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"}]}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "cdk-dotnet-to-terraform", "skill_path": "/Users/dejanwho/Projects/Code/mudblazor-skills/skills/cdk-dotnet-to-terraform", "executor_model": "claude-opus-4-7", "timestamp": "2026-04-20T06:40:43.781950+00:00", "evals_run": [1, 2, 3], "runs_per_configuration": 1}, "runs": [{"eval_id": 1, "eval_name": "init-mode-learn-conventions", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 0.9375, "passed": 15, "failed": 1, "total": 16, "time_seconds": 300.7, "tokens": 75718, "tool_calls": 0, "errors": 0}, "expectations": [{"id": "conventions-file-exists", "text": "repo-conventions.md file is produced and non-trivial (>800 bytes)", "passed": true, "evidence": "skill-references/repo-conventions.md is 12378 bytes"}, {"id": "conventions-no-fill-in-placeholders", "text": "repo-conventions.md has no unfilled <FILL IN> placeholders remaining", "passed": true, "evidence": "confirmed absent: <\\s*FILL\\s*IN\\s*>"}, {"id": "conventions-documents-module-file-layout", "text": "repo-conventions.md mentions the module file layout (main.tf, variables.tf, outputs.tf, versions.tf)", "passed": true, "evidence": "main.tf | variables.tf | outputs.tf | versions.tf"}, {"id": "conventions-documents-snake-case-variables", "text": "repo-conventions.md identifies the snake_case variable convention", "passed": true, "evidence": "snake_case"}, {"id": "conventions-documents-tagging-pattern", "text": "repo-conventions.md documents the tagging pattern (common_tags / default_tags / tags variable)", "passed": true, "evidence": "common_tags"}, {"id": "conventions-documents-backend", "text": "repo-conventions.md mentions the S3 backend", "passed": true, "evidence": "backend | s3"}, {"id": "conventions-documents-provider-version", "text": "repo-conventions.md documents the AWS provider version floor (~> 5.70)", "passed": true, "evidence": "5.70"}, {"id": "conventions-documents-region", "text": "repo-conventions.md mentions the default region (eu-central-1)", "passed": false, "evidence": "pattern not found: eu-central-1"}, {"id": "conventions-documents-resource-label-convention", "text": "repo-conventions.md identifies the resource label convention (`this`)", "passed": true, "evidence": "resources in the root, Fargate service via this"}, {"id": "conventions-documents-per-rule-sg-style", "text": "repo-conventions.md mentions the per-resource security group rule style (aws_vpc_security_group_*_rule)", "passed": true, "evidence": "aws_vpc_security_group_ingress_rule"}, {"id": "inventory-file-exists", "text": "module-inventory.md file is produced and non-trivial (>400 bytes)", "passed": true, "evidence": "skill-references/module-inventory.md is 7875 bytes"}, {"id": "inventory-lists-network", "text": "module-inventory.md lists the network module", "passed": true, "evidence": "network"}, {"id": "inventory-lists-alb", "text": "module-inventory.md lists the alb module", "passed": true, "evidence": "alb"}, {"id": "inventory-lists-ecs-service", "text": "module-inventory.md lists the ecs-service module", "passed": true, "evidence": "ecs-service"}, {"id": "inventory-lists-iam-role", "text": "module-inventory.md lists the iam-role module", "passed": true, "evidence": "iam_role"}, {"id": "inventory-documents-inputs-outputs", "text": "module-inventory.md documents Inputs and Outputs (or equivalent) for modules", "passed": true, "evidence": "inputs: | outputs:"}], "notes": []}, {"eval_id": 1, "eval_name": "init-mode-learn-conventions", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.9375, "passed": 15, "failed": 1, "total": 16, "time_seconds": 267.3, "tokens": 58940, "tool_calls": 0, "errors": 0}, "expectations": [{"id": "conventions-file-exists", "text": "repo-conventions.md file is produced and non-trivial (>800 bytes)", "passed": true, "evidence": "skill-references/repo-conventions.md is 14748 bytes"}, {"id": "conventions-no-fill-in-placeholders", "text": "repo-conventions.md has no unfilled <FILL IN> placeholders remaining", "passed": true, "evidence": "confirmed absent: <\\s*FILL\\s*IN\\s*>"}, {"id": "conventions-documents-module-file-layout", "text": "repo-conventions.md mentions the module file layout (main.tf, variables.tf, outputs.tf, versions.tf)", "passed": true, "evidence": "main.tf | variables.tf | outputs.tf | versions.tf"}, {"id": "conventions-documents-snake-case-variables", "text": "repo-conventions.md identifies the snake_case variable convention", "passed": true, "evidence": "snake_case"}, {"id": "conventions-documents-tagging-pattern", "text": "repo-conventions.md documents the tagging pattern (common_tags / default_tags / tags variable)", "passed": true, "evidence": "common_tags"}, {"id": "conventions-documents-backend", "text": "repo-conventions.md mentions the S3 backend", "passed": true, "evidence": "Backend | s3"}, {"id": "conventions-documents-provider-version", "text": "repo-conventions.md documents the AWS provider version floor (~> 5.70)", "passed": true, "evidence": "5.70"}, {"id": "conventions-documents-region", "text": "repo-conventions.md mentions the default region (eu-central-1)", "passed": true, "evidence": "eu-central-1"}, {"id": "conventions-documents-resource-label-convention", "text": "repo-conventions.md identifies the resource label convention (`this`)", "passed": true, "evidence": "resource:** always named `\"this\"` \u2014 e.g. `resource \"aws_vpc\" \"this\"`, `resource \"aws_lb\" \"this\"`, `resource \"aws_ecs_ser..."}, {"id": "conventions-documents-per-rule-sg-style", "text": "repo-conventions.md mentions the per-resource security group rule style (aws_vpc_security_group_*_rule)", "passed": true, "evidence": "aws_vpc_security_group_ingress_rule"}, {"id": "inventory-file-exists", "text": "module-inventory.md file is produced and non-trivial (>400 bytes)", "passed": true, "evidence": "skill-references/module-inventory.md is 18376 bytes"}, {"id": "inventory-lists-network", "text": "module-inventory.md lists the network module", "passed": true, "evidence": "network"}, {"id": "inventory-lists-alb", "text": "module-inventory.md lists the alb module", "passed": true, "evidence": "alb"}, {"id": "inventory-lists-ecs-service", "text": "module-inventory.md lists the ecs-service module", "passed": true, "evidence": "ecs-service"}, {"id": "inventory-lists-iam-role", "text": "module-inventory.md lists the iam-role module", "passed": true, "evidence": "iam_role"}, {"id": "inventory-documents-inputs-outputs", "text": "module-inventory.md documents Inputs and Outputs (or equivalent) for modules", "passed": false, "evidence": "pattern not found: [Ii]nputs?:"}], "notes": []}, {"eval_id": 2, "eval_name": "convert-greenfield-bedrock-stack", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 16, "failed": 0, "total": 16, "time_seconds": 533.6, "tokens": 125361, "tool_calls": 0, "errors": 0}, "expectations": [{"id": "has-new-live-config-dir", "text": "A new live config directory was created under terraform-host/live/dev/ (not reference-service)", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"}, {"id": "has-variables-tf", "text": "New live config has a variables.tf", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/variables.tf, terraform-host/live/dev/reference-service/variables.tf"}, {"id": "has-versions-tf", "text": "New live config has a versions.tf", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/versions.tf, terraform-host/live/dev/reference-service/versions.tf"}, {"id": "calls-network-module", "text": "main.tf calls the existing `network` module", "passed": true, "evidence": "module \"network\" {\n  source = \"../../../modules/network\""}, {"id": "calls-alb-module", "text": "main.tf calls the existing `alb` module", "passed": true, "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""}, {"id": "calls-ecs-service-module", "text": "main.tf calls the existing `ecs-service` module", "passed": true, "evidence": "module \"api_service\" {\n  source = \"../../../modules/ecs-service\""}, {"id": "has-bedrock-invoke-model", "text": "Generated Terraform grants bedrock:InvokeModel", "passed": true, "evidence": "bedrock:InvokeModel"}, {"id": "has-bedrock-invoke-stream", "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream", "passed": true, "evidence": "bedrock:InvokeModelWithResponseStream"}, {"id": "has-claude-sonnet-arn", "text": "Generated Terraform references claude-3-5-sonnet foundation model", "passed": true, "evidence": "anthropic.claude-3-5-sonnet"}, {"id": "has-claude-haiku-arn", "text": "Generated Terraform references claude-3-haiku foundation model", "passed": true, "evidence": "anthropic.claude-3-haiku"}, {"id": "has-bedrock-vpc-endpoint", "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime", "passed": true, "evidence": "com.amazonaws.${data.aws_region.current.name}.bedrock-runtime"}, {"id": "no-cdk-csharp-syntax-in-tf", "text": "No C# / CDK syntax leaked into .tf files (e.g. 'new Vpc(', 'Construct', 'PolicyStatement')", "passed": true, "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"}, {"id": "backend-s3-in-versions-tf", "text": "versions.tf includes a backend \"s3\" block matching repo convention", "passed": true, "evidence": "backend \"s3\""}, {"id": "provider-eu-central-1", "text": "AWS provider region is eu-central-1 (literal or via variable/locals with the value defined)", "passed": true, "evidence": "region = var.region | \"eu-central-1\""}, {"id": "no-cdk-token-references-left", "text": "No CFN Fn:: / Ref:: tokens or raw synth placeholders remain in the generated .tf", "passed": true, "evidence": "confirmed absent: \"Fn::[A-Z][a-zA-Z]+\" | confirmed absent: \\{\\s*\"Ref\"\\s*:"}, {"id": "uses-for-each-or-matches-style", "text": "Generated Terraform uses conventions similar to reference service (default_tags or local.common_tags pattern)", "passed": true, "evidence": "default_tags"}], "notes": []}, {"eval_id": 2, "eval_name": "convert-greenfield-bedrock-stack", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 16, "failed": 0, "total": 16, "time_seconds": 403.2, "tokens": 87675, "tool_calls": 0, "errors": 0}, "expectations": [{"id": "has-new-live-config-dir", "text": "A new live config directory was created under terraform-host/live/dev/ (not reference-service)", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"}, {"id": "has-variables-tf", "text": "New live config has a variables.tf", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/variables.tf, terraform-host/live/dev/reference-service/variables.tf"}, {"id": "has-versions-tf", "text": "New live config has a versions.tf", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/versions.tf, terraform-host/live/dev/reference-service/versions.tf"}, {"id": "calls-network-module", "text": "main.tf calls the existing `network` module", "passed": true, "evidence": "module \"network\" {\n  source = \"../../../modules/network\""}, {"id": "calls-alb-module", "text": "main.tf calls the existing `alb` module", "passed": true, "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""}, {"id": "calls-ecs-service-module", "text": "main.tf calls the existing `ecs-service` module", "passed": true, "evidence": "module \"app_service\" {\n  source = \"../../../modules/ecs-service\""}, {"id": "has-bedrock-invoke-model", "text": "Generated Terraform grants bedrock:InvokeModel", "passed": true, "evidence": "bedrock:InvokeModel"}, {"id": "has-bedrock-invoke-stream", "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream", "passed": true, "evidence": "bedrock:InvokeModelWithResponseStream"}, {"id": "has-claude-sonnet-arn", "text": "Generated Terraform references claude-3-5-sonnet foundation model", "passed": true, "evidence": "anthropic.claude-3-5-sonnet"}, {"id": "has-claude-haiku-arn", "text": "Generated Terraform references claude-3-haiku foundation model", "passed": true, "evidence": "anthropic.claude-3-haiku"}, {"id": "has-bedrock-vpc-endpoint", "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime", "passed": true, "evidence": "com.amazonaws.<region>.bedrock-runtime"}, {"id": "no-cdk-csharp-syntax-in-tf", "text": "No C# / CDK syntax leaked into .tf files (e.g. 'new Vpc(', 'Construct', 'PolicyStatement')", "passed": true, "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"}, {"id": "backend-s3-in-versions-tf", "text": "versions.tf includes a backend \"s3\" block matching repo convention", "passed": true, "evidence": "backend \"s3\""}, {"id": "provider-eu-central-1", "text": "AWS provider region is eu-central-1 (literal or via variable/locals with the value defined)", "passed": true, "evidence": "region = \"eu-central-1\""}, {"id": "no-cdk-token-references-left", "text": "No CFN Fn:: / Ref:: tokens or raw synth placeholders remain in the generated .tf", "passed": true, "evidence": "confirmed absent: \"Fn::[A-Z][a-zA-Z]+\" | confirmed absent: \\{\\s*\"Ref\"\\s*:"}, {"id": "uses-for-each-or-matches-style", "text": "Generated Terraform uses conventions similar to reference service (default_tags or local.common_tags pattern)", "passed": true, "evidence": "default_tags"}], "notes": []}, {"eval_id": 3, "eval_name": "convert-with-vpc-import", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 12, "failed": 0, "total": 12, "time_seconds": 629.3, "tokens": 132409, "tool_calls": 0, "errors": 0}, "expectations": [{"id": "has-new-live-config-dir", "text": "A new live config directory was created under terraform-host/live/dev/", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"}, {"id": "calls-network-module", "text": "main.tf calls the existing `network` module (not raw VPC resources)", "passed": true, "evidence": "module \"network\" {\n  source = \"../../../modules/network\""}, {"id": "calls-alb-module", "text": "main.tf calls the existing `alb` module", "passed": true, "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""}, {"id": "calls-ecs-service-module", "text": "main.tf calls the existing `ecs-service` module", "passed": true, "evidence": "module \"api_service\" {\n  source = \"../../../modules/ecs-service\""}, {"id": "has-bedrock-invoke-model", "text": "Generated Terraform grants bedrock:InvokeModel", "passed": true, "evidence": "bedrock:InvokeModel"}, {"id": "has-bedrock-invoke-stream", "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream", "passed": true, "evidence": "bedrock:InvokeModelWithResponseStream"}, {"id": "has-bedrock-vpc-endpoint", "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime", "passed": true, "evidence": "com.amazonaws.${data.aws_region.current.name}.bedrock-runtime"}, {"id": "has-imports-tf", "text": "An imports.tf file was created in the new live config directory", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/imports.tf"}, {"id": "has-vpc-import-block", "text": "imports.tf contains an import block adopting the deployed VPC", "passed": true, "evidence": "import { | vpc-0a1b2c3d4e5f6a7b8"}, {"id": "import-to-addresses-vpc", "text": "The VPC import block's `to` address references a VPC resource (module or raw)", "passed": true, "evidence": "to = module.network.aws_vpc.this"}, {"id": "no-duplicate-vpc-resource", "text": "No raw `resource \"aws_vpc\" \"...\"` in the live config alongside the module (would conflict with import into module)", "passed": true, "evidence": "confirmed absent: ^\\s*resource\\s+\"aws_vpc\"\\s+\""}, {"id": "no-cdk-csharp-syntax-in-tf", "text": "No C# / CDK syntax leaked into .tf files", "passed": true, "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"}], "notes": []}, {"eval_id": 3, "eval_name": "convert-with-vpc-import", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.8333333333333334, "passed": 10, "failed": 2, "total": 12, "time_seconds": 406.2, "tokens": 91877, "tool_calls": 0, "errors": 0}, "expectations": [{"id": "has-new-live-config-dir", "text": "A new live config directory was created under terraform-host/live/dev/", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"}, {"id": "calls-network-module", "text": "main.tf calls the existing `network` module (not raw VPC resources)", "passed": false, "evidence": "pattern not found: module\\s+\"[^\"]*\"\\s*\\{[^}]*source\\s*=\\s*\"[^\"]*modules/network\""}, {"id": "calls-alb-module", "text": "main.tf calls the existing `alb` module", "passed": true, "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""}, {"id": "calls-ecs-service-module", "text": "main.tf calls the existing `ecs-service` module", "passed": true, "evidence": "module \"api_service\" {\n  source = \"../../../modules/ecs-service\""}, {"id": "has-bedrock-invoke-model", "text": "Generated Terraform grants bedrock:InvokeModel", "passed": true, "evidence": "bedrock:InvokeModel"}, {"id": "has-bedrock-invoke-stream", "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream", "passed": true, "evidence": "bedrock:InvokeModelWithResponseStream"}, {"id": "has-bedrock-vpc-endpoint", "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime", "passed": true, "evidence": "com.amazonaws.${data.aws_region.current.name}.bedrock-runtime"}, {"id": "has-imports-tf", "text": "An imports.tf file was created in the new live config directory", "passed": true, "evidence": "terraform-host/live/dev/bedrock-chat/imports.tf"}, {"id": "has-vpc-import-block", "text": "imports.tf contains an import block adopting the deployed VPC", "passed": true, "evidence": "import { | vpc-0a1b2c3d4e5f6a7b8"}, {"id": "import-to-addresses-vpc", "text": "The VPC import block's `to` address references a VPC resource (module or raw)", "passed": true, "evidence": "to = module.network.aws_vpc.this"}, {"id": "no-duplicate-vpc-resource", "text": "No raw `resource \"aws_vpc\" \"...\"` in the live config alongside the module (would conflict with import into module)", "passed": false, "evidence": "unwanted pattern found: resource \"aws_vpc\" \""}, {"id": "no-cdk-csharp-syntax-in-tf", "text": "No C# / CDK syntax leaked into .tf files", "passed": true, "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"}], "notes": []}], "run_summary": {"with_skill": {"pass_rate": {"mean": 0.9792, "stddev": 0.0361, "min": 0.9375, "max": 1.0}, "time_seconds": {"mean": 487.8667, "stddev": 169.0063, "min": 300.7, "max": 629.3}, "tokens": {"mean": 111162.6667, "stddev": 30897.603, "min": 75718, "max": 132409}}, "without_skill": {"pass_rate": {"mean": 0.9236, "stddev": 0.0842, "min": 0.8333, "max": 1.0}, "time_seconds": {"mean": 358.9, "stddev": 79.3421, "min": 267.3, "max": 406.2}, "tokens": {"mean": 79497.3333, "stddev": 17926.7166, "min": 58940, "max": 91877}}, "delta": {"pass_rate": "+0.0556", "time_seconds": "+129.0", "tokens": "+31665"}}, "notes": ["Eval 1: with_skill wins on 1 assertion(s): module-inventory.md documents Inputs and Outputs (or equivalent) for modules", "Eval 1: baseline wins on 1 assertion(s) \u2014 worth investigating: repo-conventions.md mentions the default region (eu-central-1)", "Eval 3: with_skill wins on 2 assertion(s): main.tf calls the existing `network` module (not raw VPC resources), No raw `resource \"aws_vpc\" \"...\"` in the live config alongside the module (would", "Time: with_skill avg 487.9s vs baseline avg 358.9s (\u0394 +129.0s).", "Tokens: with_skill avg 111163 vs baseline avg 79497 (\u0394 +31665)."]}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

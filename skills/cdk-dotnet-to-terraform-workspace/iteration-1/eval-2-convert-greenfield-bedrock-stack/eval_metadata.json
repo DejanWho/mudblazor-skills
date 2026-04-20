@@ -1,0 +1,23 @@
+{
+  "eval_id": 2,
+  "eval_name": "convert-greenfield-bedrock-stack",
+  "prompt": "Convert the CDK .NET 8 stack (ALB → Fargate → Bedrock) into Terraform in the host repo, reusing existing modules.",
+  "assertions": [
+    { "id": "has-new-live-config-dir", "text": "New live config dir with main.tf" },
+    { "id": "has-variables-tf", "text": "variables.tf present" },
+    { "id": "has-versions-tf", "text": "versions.tf present" },
+    { "id": "calls-network-module", "text": "Uses the network module" },
+    { "id": "calls-alb-module", "text": "Uses the alb module" },
+    { "id": "calls-ecs-service-module", "text": "Uses the ecs-service module" },
+    { "id": "has-bedrock-invoke-model", "text": "Grants bedrock:InvokeModel" },
+    { "id": "has-bedrock-invoke-stream", "text": "Grants bedrock:InvokeModelWithResponseStream" },
+    { "id": "has-claude-sonnet-arn", "text": "References claude-3-5-sonnet" },
+    { "id": "has-claude-haiku-arn", "text": "References claude-3-haiku" },
+    { "id": "has-bedrock-vpc-endpoint", "text": "Interface VPC endpoint for bedrock-runtime" },
+    { "id": "no-cdk-csharp-syntax-in-tf", "text": "No C# / CDK syntax in .tf files" },
+    { "id": "backend-s3-in-versions-tf", "text": "backend \"s3\" block in versions.tf" },
+    { "id": "provider-eu-central-1", "text": "Provider region eu-central-1" },
+    { "id": "no-cdk-token-references-left", "text": "No CFN Fn:: / Ref:: tokens remain" },
+    { "id": "uses-for-each-or-matches-style", "text": "Tagging pattern matches repo" }
+  ]
+}

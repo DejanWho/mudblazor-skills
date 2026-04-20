@@ -1,0 +1,23 @@
+{
+  "eval_id": 1,
+  "eval_name": "init-mode-learn-conventions",
+  "prompt": "Analyze the host Terraform repo, learn its conventions, produce repo-conventions.md + module-inventory.md.",
+  "assertions": [
+    { "id": "conventions-file-exists", "text": "repo-conventions.md is produced and non-trivial (>800 bytes)" },
+    { "id": "conventions-no-fill-in-placeholders", "text": "repo-conventions.md has no unfilled <FILL IN> placeholders" },
+    { "id": "conventions-documents-module-file-layout", "text": "Documents the module file layout (main/variables/outputs/versions)" },
+    { "id": "conventions-documents-snake-case-variables", "text": "Identifies the snake_case variable convention" },
+    { "id": "conventions-documents-tagging-pattern", "text": "Documents the tagging pattern" },
+    { "id": "conventions-documents-backend", "text": "Mentions the S3 backend" },
+    { "id": "conventions-documents-provider-version", "text": "Documents the AWS provider version floor (~> 5.70)" },
+    { "id": "conventions-documents-region", "text": "Mentions the eu-central-1 default region" },
+    { "id": "conventions-documents-resource-label-convention", "text": "Identifies the `this` resource-label convention" },
+    { "id": "conventions-documents-per-rule-sg-style", "text": "Mentions per-resource SG rule style" },
+    { "id": "inventory-file-exists", "text": "module-inventory.md produced and non-trivial (>400 bytes)" },
+    { "id": "inventory-lists-network", "text": "Lists the network module" },
+    { "id": "inventory-lists-alb", "text": "Lists the alb module" },
+    { "id": "inventory-lists-ecs-service", "text": "Lists the ecs-service module" },
+    { "id": "inventory-lists-iam-role", "text": "Lists the iam-role module" },
+    { "id": "inventory-documents-inputs-outputs", "text": "Documents Inputs and Outputs for modules" }
+  ]
+}

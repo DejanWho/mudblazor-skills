@@ -1,0 +1,105 @@
+{
+  "eval_name": "eval-2-convert-greenfield-bedrock-stack",
+  "condition": "with_skill",
+  "passed": 16,
+  "total": 16,
+  "pass_rate": 1.0,
+  "expectations": [
+    {
+      "id": "has-new-live-config-dir",
+      "text": "A new live config directory was created under terraform-host/live/dev/ (not reference-service)",
+      "passed": true,
+      "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"
+    },
+    {
+      "id": "has-variables-tf",
+      "text": "New live config has a variables.tf",
+      "passed": true,
+      "evidence": "terraform-host/live/dev/bedrock-chat/variables.tf, terraform-host/live/dev/reference-service/variables.tf"
+    },
+    {
+      "id": "has-versions-tf",
+      "text": "New live config has a versions.tf",
+      "passed": true,
+      "evidence": "terraform-host/live/dev/bedrock-chat/versions.tf, terraform-host/live/dev/reference-service/versions.tf"
+    },
+    {
+      "id": "calls-network-module",
+      "text": "main.tf calls the existing `network` module",
+      "passed": true,
+      "evidence": "module \"network\" {\n  source = \"../../../modules/network\""
+    },
+    {
+      "id": "calls-alb-module",
+      "text": "main.tf calls the existing `alb` module",
+      "passed": true,
+      "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""
+    },
+    {
+      "id": "calls-ecs-service-module",
+      "text": "main.tf calls the existing `ecs-service` module",
+      "passed": true,
+      "evidence": "module \"api_service\" {\n  source = \"../../../modules/ecs-service\""
+    },
+    {
+      "id": "has-bedrock-invoke-model",
+      "text": "Generated Terraform grants bedrock:InvokeModel",
+      "passed": true,
+      "evidence": "bedrock:InvokeModel"
+    },
+    {
+      "id": "has-bedrock-invoke-stream",
+      "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream",
+      "passed": true,
+      "evidence": "bedrock:InvokeModelWithResponseStream"
+    },
+    {
+      "id": "has-claude-sonnet-arn",
+      "text": "Generated Terraform references claude-3-5-sonnet foundation model",
+      "passed": true,
+      "evidence": "anthropic.claude-3-5-sonnet"
+    },
+    {
+      "id": "has-claude-haiku-arn",
+      "text": "Generated Terraform references claude-3-haiku foundation model",
+      "passed": true,
+      "evidence": "anthropic.claude-3-haiku"
+    },
+    {
+      "id": "has-bedrock-vpc-endpoint",
+      "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime",
+      "passed": true,
+      "evidence": "com.amazonaws.${data.aws_region.current.name}.bedrock-runtime"
+    },
+    {
+      "id": "no-cdk-csharp-syntax-in-tf",
+      "text": "No C# / CDK syntax leaked into .tf files (e.g. 'new Vpc(', 'Construct', 'PolicyStatement')",
+      "passed": true,
+      "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"
+    },
+    {
+      "id": "backend-s3-in-versions-tf",
+      "text": "versions.tf includes a backend \"s3\" block matching repo convention",
+      "passed": true,
+      "evidence": "backend \"s3\""
+    },
+    {
+      "id": "provider-eu-central-1",
+      "text": "AWS provider region is eu-central-1 (literal or via variable/locals with the value defined)",
+      "passed": true,
+      "evidence": "region = var.region | \"eu-central-1\""
+    },
+    {
+      "id": "no-cdk-token-references-left",
+      "text": "No CFN Fn:: / Ref:: tokens or raw synth placeholders remain in the generated .tf",
+      "passed": true,
+      "evidence": "confirmed absent: \"Fn::[A-Z][a-zA-Z]+\" | confirmed absent: \\{\\s*\"Ref\"\\s*:"
+    },
+    {
+      "id": "uses-for-each-or-matches-style",
+      "text": "Generated Terraform uses conventions similar to reference service (default_tags or local.common_tags pattern)",
+      "passed": true,
+      "evidence": "default_tags"
+    }
+  ]
+}

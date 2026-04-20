@@ -1,0 +1,19 @@
+{
+  "eval_id": 3,
+  "eval_name": "convert-with-vpc-import",
+  "prompt": "Convert as before but VPC vpc-0a1b2c3d4e5f6a7b8 is already deployed and must be imported, rest greenfield.",
+  "assertions": [
+    { "id": "has-new-live-config-dir", "text": "New live config dir with main.tf" },
+    { "id": "calls-network-module", "text": "Uses the network module (not raw aws_vpc)" },
+    { "id": "calls-alb-module", "text": "Uses the alb module" },
+    { "id": "calls-ecs-service-module", "text": "Uses the ecs-service module" },
+    { "id": "has-bedrock-invoke-model", "text": "Grants bedrock:InvokeModel" },
+    { "id": "has-bedrock-invoke-stream", "text": "Grants bedrock:InvokeModelWithResponseStream" },
+    { "id": "has-bedrock-vpc-endpoint", "text": "Interface VPC endpoint for bedrock-runtime" },
+    { "id": "has-imports-tf", "text": "imports.tf exists" },
+    { "id": "has-vpc-import-block", "text": "imports.tf contains an import block with vpc-0a1b2c3d4e5f6a7b8" },
+    { "id": "import-to-addresses-vpc", "text": "Import to addresses a VPC resource" },
+    { "id": "no-duplicate-vpc-resource", "text": "No raw aws_vpc in live config that would collide with module-imported one" },
+    { "id": "no-cdk-csharp-syntax-in-tf", "text": "No C# / CDK syntax in .tf files" }
+  ]
+}

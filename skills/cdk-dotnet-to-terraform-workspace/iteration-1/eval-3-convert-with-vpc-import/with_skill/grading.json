@@ -1,0 +1,81 @@
+{
+  "eval_name": "eval-3-convert-with-vpc-import",
+  "condition": "with_skill",
+  "passed": 12,
+  "total": 12,
+  "pass_rate": 1.0,
+  "expectations": [
+    {
+      "id": "has-new-live-config-dir",
+      "text": "A new live config directory was created under terraform-host/live/dev/",
+      "passed": true,
+      "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"
+    },
+    {
+      "id": "calls-network-module",
+      "text": "main.tf calls the existing `network` module (not raw VPC resources)",
+      "passed": true,
+      "evidence": "module \"network\" {\n  source = \"../../../modules/network\""
+    },
+    {
+      "id": "calls-alb-module",
+      "text": "main.tf calls the existing `alb` module",
+      "passed": true,
+      "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""
+    },
+    {
+      "id": "calls-ecs-service-module",
+      "text": "main.tf calls the existing `ecs-service` module",
+      "passed": true,
+      "evidence": "module \"api_service\" {\n  source = \"../../../modules/ecs-service\""
+    },
+    {
+      "id": "has-bedrock-invoke-model",
+      "text": "Generated Terraform grants bedrock:InvokeModel",
+      "passed": true,
+      "evidence": "bedrock:InvokeModel"
+    },
+    {
+      "id": "has-bedrock-invoke-stream",
+      "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream",
+      "passed": true,
+      "evidence": "bedrock:InvokeModelWithResponseStream"
+    },
+    {
+      "id": "has-bedrock-vpc-endpoint",
+      "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime",
+      "passed": true,
+      "evidence": "com.amazonaws.${data.aws_region.current.name}.bedrock-runtime"
+    },
+    {
+      "id": "has-imports-tf",
+      "text": "An imports.tf file was created in the new live config directory",
+      "passed": true,
+      "evidence": "terraform-host/live/dev/bedrock-chat/imports.tf"
+    },
+    {
+      "id": "has-vpc-import-block",
+      "text": "imports.tf contains an import block adopting the deployed VPC",
+      "passed": true,
+      "evidence": "import { | vpc-0a1b2c3d4e5f6a7b8"
+    },
+    {
+      "id": "import-to-addresses-vpc",
+      "text": "The VPC import block's `to` address references a VPC resource (module or raw)",
+      "passed": true,
+      "evidence": "to = module.network.aws_vpc.this"
+    },
+    {
+      "id": "no-duplicate-vpc-resource",
+      "text": "No raw `resource \"aws_vpc\" \"...\"` in the live config alongside the module (would conflict with import into module)",
+      "passed": true,
+      "evidence": "confirmed absent: ^\\s*resource\\s+\"aws_vpc\"\\s+\""
+    },
+    {
+      "id": "no-cdk-csharp-syntax-in-tf",
+      "text": "No C# / CDK syntax leaked into .tf files",
+      "passed": true,
+      "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"
+    }
+  ]
+}

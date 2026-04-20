@@ -1,0 +1,5 @@
+# cdk.out — pre-computed for eval fixture
+
+These files are a **compact, representative** `cdk synth` snapshot of `BedrockChatStack-dev` — *not* a full one. A real `cdk synth` would produce ~40–60 resources for this stack (all 6 subnets, 3 NAT gateways, 3 EIPs, route tables, route table associations, ingress rules as separate resources, CDK Metadata resource, etc). The template here keeps one of each subnet (public/private) and elides route-tabley boilerplate to keep the fixture readable.
+
+**Do not** use `LogicalResourceId` values here as ground truth for what a deployed stack's physical IDs would be — they're representative only. For eval purposes, the evaluated skill should be able to translate from either the C# source or this template to Terraform. The fixture's eval prompts specify "greenfield for all compute resources, but the VPC already exists with id `vpc-0a1b2c3d4e5f6a7b8` and must be imported" — that import ID is synthetic (doesn't match what's in this template) and is the canonical one the skill should use for the `import` block.

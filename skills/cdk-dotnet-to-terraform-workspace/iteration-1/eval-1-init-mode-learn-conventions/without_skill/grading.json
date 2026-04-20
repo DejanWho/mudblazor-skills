@@ -1,0 +1,105 @@
+{
+  "eval_name": "eval-1-init-mode-learn-conventions",
+  "condition": "without_skill",
+  "passed": 15,
+  "total": 16,
+  "pass_rate": 0.9375,
+  "expectations": [
+    {
+      "id": "conventions-file-exists",
+      "text": "repo-conventions.md file is produced and non-trivial (>800 bytes)",
+      "passed": true,
+      "evidence": "skill-references/repo-conventions.md is 14748 bytes"
+    },
+    {
+      "id": "conventions-no-fill-in-placeholders",
+      "text": "repo-conventions.md has no unfilled <FILL IN> placeholders remaining",
+      "passed": true,
+      "evidence": "confirmed absent: <\\s*FILL\\s*IN\\s*>"
+    },
+    {
+      "id": "conventions-documents-module-file-layout",
+      "text": "repo-conventions.md mentions the module file layout (main.tf, variables.tf, outputs.tf, versions.tf)",
+      "passed": true,
+      "evidence": "main.tf | variables.tf | outputs.tf | versions.tf"
+    },
+    {
+      "id": "conventions-documents-snake-case-variables",
+      "text": "repo-conventions.md identifies the snake_case variable convention",
+      "passed": true,
+      "evidence": "snake_case"
+    },
+    {
+      "id": "conventions-documents-tagging-pattern",
+      "text": "repo-conventions.md documents the tagging pattern (common_tags / default_tags / tags variable)",
+      "passed": true,
+      "evidence": "common_tags"
+    },
+    {
+      "id": "conventions-documents-backend",
+      "text": "repo-conventions.md mentions the S3 backend",
+      "passed": true,
+      "evidence": "Backend | s3"
+    },
+    {
+      "id": "conventions-documents-provider-version",
+      "text": "repo-conventions.md documents the AWS provider version floor (~> 5.70)",
+      "passed": true,
+      "evidence": "5.70"
+    },
+    {
+      "id": "conventions-documents-region",
+      "text": "repo-conventions.md mentions the default region (eu-central-1)",
+      "passed": true,
+      "evidence": "eu-central-1"
+    },
+    {
+      "id": "conventions-documents-resource-label-convention",
+      "text": "repo-conventions.md identifies the resource label convention (`this`)",
+      "passed": true,
+      "evidence": "resource:** always named `\"this\"` \u2014 e.g. `resource \"aws_vpc\" \"this\"`, `resource \"aws_lb\" \"this\"`, `resource \"aws_ecs_ser..."
+    },
+    {
+      "id": "conventions-documents-per-rule-sg-style",
+      "text": "repo-conventions.md mentions the per-resource security group rule style (aws_vpc_security_group_*_rule)",
+      "passed": true,
+      "evidence": "aws_vpc_security_group_ingress_rule"
+    },
+    {
+      "id": "inventory-file-exists",
+      "text": "module-inventory.md file is produced and non-trivial (>400 bytes)",
+      "passed": true,
+      "evidence": "skill-references/module-inventory.md is 18376 bytes"
+    },
+    {
+      "id": "inventory-lists-network",
+      "text": "module-inventory.md lists the network module",
+      "passed": true,
+      "evidence": "network"
+    },
+    {
+      "id": "inventory-lists-alb",
+      "text": "module-inventory.md lists the alb module",
+      "passed": true,
+      "evidence": "alb"
+    },
+    {
+      "id": "inventory-lists-ecs-service",
+      "text": "module-inventory.md lists the ecs-service module",
+      "passed": true,
+      "evidence": "ecs-service"
+    },
+    {
+      "id": "inventory-lists-iam-role",
+      "text": "module-inventory.md lists the iam-role module",
+      "passed": true,
+      "evidence": "iam_role"
+    },
+    {
+      "id": "inventory-documents-inputs-outputs",
+      "text": "module-inventory.md documents Inputs and Outputs (or equivalent) for modules",
+      "passed": false,
+      "evidence": "pattern not found: [Ii]nputs?:"
+    }
+  ]
+}

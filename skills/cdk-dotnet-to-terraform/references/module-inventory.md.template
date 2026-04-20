@@ -1,0 +1,79 @@
+# Module Inventory (TEMPLATE)
+
+**This file is a template. Init mode writes the real `module-inventory.md` (without the `.template` suffix) in this same directory after walking the host repo.** If you see this file during convert mode without a sibling `module-inventory.md`, run init first.
+
+This is the catalogue of modules already present in the host repo. Convert mode consults this file to decide whether a CDK construct maps to an existing module or requires authoring a new one. The *shape* — inputs and outputs — matters more than the name; two modules named `vpc` in different repos may behave very differently.
+
+---
+
+## Entry format
+
+One entry per module. Use this shape:
+
+```
+### `<relative-path>/<module-name>`
+
+- **Purpose:** <one-sentence description of what the module creates>
+- **Key inputs:** `<var1>` (<type>, <required/default>), `<var2>` (<type>, <required/default>), ...
+- **Key outputs:** `<out1>` (<description>), `<out2>` (<description>), ...
+- **Matches CDK constructs:** <list of CDK construct patterns that should map to this module — e.g. `Vpc` + `InterfaceVpcEndpoint` wiring, `FargateService` + `ApplicationLoadBalancer` combined>
+- **Notes:** <anything a future conversion needs to know — quirks, assumptions, known limitations>
+```
+
+## Example entries (replace with real ones during init)
+
+### `modules/network`
+
+- **Purpose:** VPC with public + private subnets across configurable AZs, NAT gateway per AZ, VPC flow logs to CloudWatch.
+- **Key inputs:** `name` (string, required), `cidr_block` (string, required), `azs` (list(string), required), `nat_strategy` ("per-az" | "shared", default "per-az"), `enable_flow_logs` (bool, default true), `tags` (map(string), default {})
+- **Key outputs:** `vpc_id`, `vpc_cidr_block`, `public_subnet_ids` (list), `private_subnet_ids` (list), `intra_subnet_ids` (list), `default_security_group_id`, `nat_gateway_ids` (list)
+- **Matches CDK constructs:** `Amazon.CDK.AWS.EC2.Vpc` (with `SubnetConfiguration` for public + private), any `InterfaceVpcEndpoint` / `GatewayVpcEndpoint` added to the same VPC
+- **Notes:** Adding a new interface endpoint (e.g. `bedrock-runtime`) requires a follow-up `aws_vpc_endpoint` resource in the caller — the module doesn't take a variadic list of endpoints. If a conversion needs multiple endpoints, author them at the call site, not inside the module.
+
+### `modules/ecs-service`
+
+- **Purpose:** Fargate service behind an existing ALB target group, with CloudWatch log group, task + execution IAM roles, and optional secrets/config env vars.
+- **Key inputs:** `service_name` (string, required), `cluster_arn` (string, required), `image` (string, required), `cpu` (number, default 512), `memory` (number, default 1024), `desired_count` (number, default 2), `vpc_id` (string, required), `subnet_ids` (list(string), required), `target_group_arn` (string, required), `container_port` (number, default 8080), `environment_variables` (map(string), default {}), `secret_arns` (map(string), default {}), `additional_task_role_policy_arns` (list(string), default []), `log_retention_days` (number, default 30), `tags` (map(string), default {})
+- **Key outputs:** `service_arn`, `service_name`, `task_definition_arn`, `task_role_arn`, `task_role_name`, `log_group_name`, `security_group_id`
+- **Matches CDK constructs:** `Amazon.CDK.AWS.ECS.FargateService` + `FargateTaskDefinition` attached to `ApplicationTargetGroup`. Task role permissions (e.g. `bedrock:InvokeModel`) are attached by the caller via `additional_task_role_policy_arns` or a separate `aws_iam_role_policy`.
+- **Notes:** ALB + target group + listener should be in a separate module or inline; this module only attaches to an existing target group. Autoscaling is not included — add `aws_appautoscaling_target` + `_policy` at the caller if needed.
+
+### `modules/alb`
+
+- **Purpose:** Application load balancer with HTTPS listener (certificate from ACM), HTTP→HTTPS redirect, and a default 404 action. Callers add listener rules and target groups on top.
+- **Key inputs:** `name` (string, required), `vpc_id` (string, required), `public_subnet_ids` (list(string), required), `certificate_arn` (string, required), `allowed_cidr_blocks` (list(string), default ["0.0.0.0/0"]), `internal` (bool, default false), `idle_timeout` (number, default 60), `tags` (map(string), default {})
+- **Key outputs:** `alb_arn`, `alb_dns_name`, `alb_zone_id`, `https_listener_arn`, `security_group_id`
+- **Matches CDK constructs:** `Amazon.CDK.AWS.ElasticLoadBalancingV2.ApplicationLoadBalancer` with a standard 443 listener + 80-to-443 redirect.
+- **Notes:** Target groups and listener rules are intentionally outside this module — they're wired in the service modules (so each service owns its own target group). See `modules/ecs-service` for the typical pairing.
+
+### `modules/iam-role`
+
+- **Purpose:** IAM role with trust policy, managed-policy attachments, and optional inline policy. Used for service roles, instance profiles, and assumed roles.
+- **Key inputs:** `name` (string, required), `trust_policy_json` (string, required), `managed_policy_arns` (list(string), default []), `inline_policies` (map(string), default {}), `max_session_duration` (number, default 3600), `tags` (map(string), default {})
+- **Key outputs:** `role_arn`, `role_name`, `role_id`
+- **Matches CDK constructs:** `Amazon.CDK.AWS.IAM.Role` — and any `AddToPolicy(...)` calls become entries in `inline_policies`.
+- **Notes:** Managed policy ARNs for AWS-managed policies follow `arn:aws:iam::aws:policy/<name>`. For customer-managed, use the policy module output. Instance profiles are not created by this module — add `aws_iam_instance_profile` at the caller when needed.
+
+### `modules/lambda`
+
+- **Purpose:** Lambda function with execution role, CloudWatch log group, and optional VPC attachment + dead-letter queue.
+- **Key inputs:** `function_name` (string, required), `handler` (string, required), `runtime` (string, required), `source_path` (string, required), `memory_size` (number, default 512), `timeout` (number, default 30), `environment_variables` (map(string), default {}), `vpc_config` (object, default null), `dead_letter_arn` (string, default null), `additional_policy_arns` (list(string), default []), `log_retention_days` (number, default 30), `tags` (map(string), default {})
+- **Key outputs:** `function_arn`, `function_name`, `role_arn`, `role_name`, `log_group_name`
+- **Matches CDK constructs:** `Amazon.CDK.AWS.Lambda.Function` with asset-based code (`Code.FromAsset(...)`).
+- **Notes:** Uses `archive_file` data source to zip `source_path`. Does not handle container-image Lambdas — author a separate module or a raw `aws_lambda_function` if needed.
+
+---
+
+*This file was generated by `cdk-dotnet-to-terraform` init mode on `<FILL IN date>`. Add entries here after authoring new modules during convert mode. Commit this file.*
+
+## How convert mode uses this file
+
+For each resource or construct in the CDK project:
+
+1. Read the inventory.
+2. Find a module whose **key inputs** can be supplied from what the CDK construct has, and whose **key outputs** expose what downstream constructs need.
+3. If a match exists → use that module. If the match is partial (90% but one thing is missing) → consider whether extending the module makes sense, ask the user.
+4. If no match exists → author a new module in the same style. Add it to this inventory.
+5. If the pattern is one-off / trivially small → raw resources in the root config are fine.
+
+The guiding principle: **same inputs + outputs + purpose = same module**. Don't reject a module just because its name isn't what you'd have picked.

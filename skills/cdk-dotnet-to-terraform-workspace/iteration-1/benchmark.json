@@ -1,0 +1,712 @@
+{
+  "metadata": {
+    "skill_name": "cdk-dotnet-to-terraform",
+    "skill_path": "/Users/dejanwho/Projects/Code/mudblazor-skills/skills/cdk-dotnet-to-terraform",
+    "executor_model": "claude-opus-4-7",
+    "timestamp": "2026-04-20T06:40:43.781950+00:00",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "init-mode-learn-conventions",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.9375,
+        "passed": 15,
+        "failed": 1,
+        "total": 16,
+        "time_seconds": 300.7,
+        "tokens": 75718,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "conventions-file-exists",
+          "text": "repo-conventions.md file is produced and non-trivial (>800 bytes)",
+          "passed": true,
+          "evidence": "skill-references/repo-conventions.md is 12378 bytes"
+        },
+        {
+          "id": "conventions-no-fill-in-placeholders",
+          "text": "repo-conventions.md has no unfilled <FILL IN> placeholders remaining",
+          "passed": true,
+          "evidence": "confirmed absent: <\\s*FILL\\s*IN\\s*>"
+        },
+        {
+          "id": "conventions-documents-module-file-layout",
+          "text": "repo-conventions.md mentions the module file layout (main.tf, variables.tf, outputs.tf, versions.tf)",
+          "passed": true,
+          "evidence": "main.tf | variables.tf | outputs.tf | versions.tf"
+        },
+        {
+          "id": "conventions-documents-snake-case-variables",
+          "text": "repo-conventions.md identifies the snake_case variable convention",
+          "passed": true,
+          "evidence": "snake_case"
+        },
+        {
+          "id": "conventions-documents-tagging-pattern",
+          "text": "repo-conventions.md documents the tagging pattern (common_tags / default_tags / tags variable)",
+          "passed": true,
+          "evidence": "common_tags"
+        },
+        {
+          "id": "conventions-documents-backend",
+          "text": "repo-conventions.md mentions the S3 backend",
+          "passed": true,
+          "evidence": "backend | s3"
+        },
+        {
+          "id": "conventions-documents-provider-version",
+          "text": "repo-conventions.md documents the AWS provider version floor (~> 5.70)",
+          "passed": true,
+          "evidence": "5.70"
+        },
+        {
+          "id": "conventions-documents-region",
+          "text": "repo-conventions.md mentions the default region (eu-central-1)",
+          "passed": false,
+          "evidence": "pattern not found: eu-central-1"
+        },
+        {
+          "id": "conventions-documents-resource-label-convention",
+          "text": "repo-conventions.md identifies the resource label convention (`this`)",
+          "passed": true,
+          "evidence": "resources in the root, Fargate service via this"
+        },
+        {
+          "id": "conventions-documents-per-rule-sg-style",
+          "text": "repo-conventions.md mentions the per-resource security group rule style (aws_vpc_security_group_*_rule)",
+          "passed": true,
+          "evidence": "aws_vpc_security_group_ingress_rule"
+        },
+        {
+          "id": "inventory-file-exists",
+          "text": "module-inventory.md file is produced and non-trivial (>400 bytes)",
+          "passed": true,
+          "evidence": "skill-references/module-inventory.md is 7875 bytes"
+        },
+        {
+          "id": "inventory-lists-network",
+          "text": "module-inventory.md lists the network module",
+          "passed": true,
+          "evidence": "network"
+        },
+        {
+          "id": "inventory-lists-alb",
+          "text": "module-inventory.md lists the alb module",
+          "passed": true,
+          "evidence": "alb"
+        },
+        {
+          "id": "inventory-lists-ecs-service",
+          "text": "module-inventory.md lists the ecs-service module",
+          "passed": true,
+          "evidence": "ecs-service"
+        },
+        {
+          "id": "inventory-lists-iam-role",
+          "text": "module-inventory.md lists the iam-role module",
+          "passed": true,
+          "evidence": "iam_role"
+        },
+        {
+          "id": "inventory-documents-inputs-outputs",
+          "text": "module-inventory.md documents Inputs and Outputs (or equivalent) for modules",
+          "passed": true,
+          "evidence": "inputs: | outputs:"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "init-mode-learn-conventions",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.9375,
+        "passed": 15,
+        "failed": 1,
+        "total": 16,
+        "time_seconds": 267.3,
+        "tokens": 58940,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "conventions-file-exists",
+          "text": "repo-conventions.md file is produced and non-trivial (>800 bytes)",
+          "passed": true,
+          "evidence": "skill-references/repo-conventions.md is 14748 bytes"
+        },
+        {
+          "id": "conventions-no-fill-in-placeholders",
+          "text": "repo-conventions.md has no unfilled <FILL IN> placeholders remaining",
+          "passed": true,
+          "evidence": "confirmed absent: <\\s*FILL\\s*IN\\s*>"
+        },
+        {
+          "id": "conventions-documents-module-file-layout",
+          "text": "repo-conventions.md mentions the module file layout (main.tf, variables.tf, outputs.tf, versions.tf)",
+          "passed": true,
+          "evidence": "main.tf | variables.tf | outputs.tf | versions.tf"
+        },
+        {
+          "id": "conventions-documents-snake-case-variables",
+          "text": "repo-conventions.md identifies the snake_case variable convention",
+          "passed": true,
+          "evidence": "snake_case"
+        },
+        {
+          "id": "conventions-documents-tagging-pattern",
+          "text": "repo-conventions.md documents the tagging pattern (common_tags / default_tags / tags variable)",
+          "passed": true,
+          "evidence": "common_tags"
+        },
+        {
+          "id": "conventions-documents-backend",
+          "text": "repo-conventions.md mentions the S3 backend",
+          "passed": true,
+          "evidence": "Backend | s3"
+        },
+        {
+          "id": "conventions-documents-provider-version",
+          "text": "repo-conventions.md documents the AWS provider version floor (~> 5.70)",
+          "passed": true,
+          "evidence": "5.70"
+        },
+        {
+          "id": "conventions-documents-region",
+          "text": "repo-conventions.md mentions the default region (eu-central-1)",
+          "passed": true,
+          "evidence": "eu-central-1"
+        },
+        {
+          "id": "conventions-documents-resource-label-convention",
+          "text": "repo-conventions.md identifies the resource label convention (`this`)",
+          "passed": true,
+          "evidence": "resource:** always named `\"this\"` \u2014 e.g. `resource \"aws_vpc\" \"this\"`, `resource \"aws_lb\" \"this\"`, `resource \"aws_ecs_ser..."
+        },
+        {
+          "id": "conventions-documents-per-rule-sg-style",
+          "text": "repo-conventions.md mentions the per-resource security group rule style (aws_vpc_security_group_*_rule)",
+          "passed": true,
+          "evidence": "aws_vpc_security_group_ingress_rule"
+        },
+        {
+          "id": "inventory-file-exists",
+          "text": "module-inventory.md file is produced and non-trivial (>400 bytes)",
+          "passed": true,
+          "evidence": "skill-references/module-inventory.md is 18376 bytes"
+        },
+        {
+          "id": "inventory-lists-network",
+          "text": "module-inventory.md lists the network module",
+          "passed": true,
+          "evidence": "network"
+        },
+        {
+          "id": "inventory-lists-alb",
+          "text": "module-inventory.md lists the alb module",
+          "passed": true,
+          "evidence": "alb"
+        },
+        {
+          "id": "inventory-lists-ecs-service",
+          "text": "module-inventory.md lists the ecs-service module",
+          "passed": true,
+          "evidence": "ecs-service"
+        },
+        {
+          "id": "inventory-lists-iam-role",
+          "text": "module-inventory.md lists the iam-role module",
+          "passed": true,
+          "evidence": "iam_role"
+        },
+        {
+          "id": "inventory-documents-inputs-outputs",
+          "text": "module-inventory.md documents Inputs and Outputs (or equivalent) for modules",
+          "passed": false,
+          "evidence": "pattern not found: [Ii]nputs?:"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "convert-greenfield-bedrock-stack",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 16,
+        "failed": 0,
+        "total": 16,
+        "time_seconds": 533.6,
+        "tokens": 125361,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "has-new-live-config-dir",
+          "text": "A new live config directory was created under terraform-host/live/dev/ (not reference-service)",
+          "passed": true,
+          "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"
+        },
+        {
+          "id": "has-variables-tf",
+          "text": "New live config has a variables.tf",
+          "passed": true,
+          "evidence": "terraform-host/live/dev/bedrock-chat/variables.tf, terraform-host/live/dev/reference-service/variables.tf"
+        },
+        {
+          "id": "has-versions-tf",
+          "text": "New live config has a versions.tf",
+          "passed": true,
+          "evidence": "terraform-host/live/dev/bedrock-chat/versions.tf, terraform-host/live/dev/reference-service/versions.tf"
+        },
+        {
+          "id": "calls-network-module",
+          "text": "main.tf calls the existing `network` module",
+          "passed": true,
+          "evidence": "module \"network\" {\n  source = \"../../../modules/network\""
+        },
+        {
+          "id": "calls-alb-module",
+          "text": "main.tf calls the existing `alb` module",
+          "passed": true,
+          "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""
+        },
+        {
+          "id": "calls-ecs-service-module",
+          "text": "main.tf calls the existing `ecs-service` module",
+          "passed": true,
+          "evidence": "module \"api_service\" {\n  source = \"../../../modules/ecs-service\""
+        },
+        {
+          "id": "has-bedrock-invoke-model",
+          "text": "Generated Terraform grants bedrock:InvokeModel",
+          "passed": true,
+          "evidence": "bedrock:InvokeModel"
+        },
+        {
+          "id": "has-bedrock-invoke-stream",
+          "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream",
+          "passed": true,
+          "evidence": "bedrock:InvokeModelWithResponseStream"
+        },
+        {
+          "id": "has-claude-sonnet-arn",
+          "text": "Generated Terraform references claude-3-5-sonnet foundation model",
+          "passed": true,
+          "evidence": "anthropic.claude-3-5-sonnet"
+        },
+        {
+          "id": "has-claude-haiku-arn",
+          "text": "Generated Terraform references claude-3-haiku foundation model",
+          "passed": true,
+          "evidence": "anthropic.claude-3-haiku"
+        },
+        {
+          "id": "has-bedrock-vpc-endpoint",
+          "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime",
+          "passed": true,
+          "evidence": "com.amazonaws.${data.aws_region.current.name}.bedrock-runtime"
+        },
+        {
+          "id": "no-cdk-csharp-syntax-in-tf",
+          "text": "No C# / CDK syntax leaked into .tf files (e.g. 'new Vpc(', 'Construct', 'PolicyStatement')",
+          "passed": true,
+          "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"
+        },
+        {
+          "id": "backend-s3-in-versions-tf",
+          "text": "versions.tf includes a backend \"s3\" block matching repo convention",
+          "passed": true,
+          "evidence": "backend \"s3\""
+        },
+        {
+          "id": "provider-eu-central-1",
+          "text": "AWS provider region is eu-central-1 (literal or via variable/locals with the value defined)",
+          "passed": true,
+          "evidence": "region = var.region | \"eu-central-1\""
+        },
+        {
+          "id": "no-cdk-token-references-left",
+          "text": "No CFN Fn:: / Ref:: tokens or raw synth placeholders remain in the generated .tf",
+          "passed": true,
+          "evidence": "confirmed absent: \"Fn::[A-Z][a-zA-Z]+\" | confirmed absent: \\{\\s*\"Ref\"\\s*:"
+        },
+        {
+          "id": "uses-for-each-or-matches-style",
+          "text": "Generated Terraform uses conventions similar to reference service (default_tags or local.common_tags pattern)",
+          "passed": true,
+          "evidence": "default_tags"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "convert-greenfield-bedrock-stack",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 16,
+        "failed": 0,
+        "total": 16,
+        "time_seconds": 403.2,
+        "tokens": 87675,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "has-new-live-config-dir",
+          "text": "A new live config directory was created under terraform-host/live/dev/ (not reference-service)",
+          "passed": true,
+          "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"
+        },
+        {
+          "id": "has-variables-tf",
+          "text": "New live config has a variables.tf",
+          "passed": true,
+          "evidence": "terraform-host/live/dev/bedrock-chat/variables.tf, terraform-host/live/dev/reference-service/variables.tf"
+        },
+        {
+          "id": "has-versions-tf",
+          "text": "New live config has a versions.tf",
+          "passed": true,
+          "evidence": "terraform-host/live/dev/bedrock-chat/versions.tf, terraform-host/live/dev/reference-service/versions.tf"
+        },
+        {
+          "id": "calls-network-module",
+          "text": "main.tf calls the existing `network` module",
+          "passed": true,
+          "evidence": "module \"network\" {\n  source = \"../../../modules/network\""
+        },
+        {
+          "id": "calls-alb-module",
+          "text": "main.tf calls the existing `alb` module",
+          "passed": true,
+          "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""
+        },
+        {
+          "id": "calls-ecs-service-module",
+          "text": "main.tf calls the existing `ecs-service` module",
+          "passed": true,
+          "evidence": "module \"app_service\" {\n  source = \"../../../modules/ecs-service\""
+        },
+        {
+          "id": "has-bedrock-invoke-model",
+          "text": "Generated Terraform grants bedrock:InvokeModel",
+          "passed": true,
+          "evidence": "bedrock:InvokeModel"
+        },
+        {
+          "id": "has-bedrock-invoke-stream",
+          "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream",
+          "passed": true,
+          "evidence": "bedrock:InvokeModelWithResponseStream"
+        },
+        {
+          "id": "has-claude-sonnet-arn",
+          "text": "Generated Terraform references claude-3-5-sonnet foundation model",
+          "passed": true,
+          "evidence": "anthropic.claude-3-5-sonnet"
+        },
+        {
+          "id": "has-claude-haiku-arn",
+          "text": "Generated Terraform references claude-3-haiku foundation model",
+          "passed": true,
+          "evidence": "anthropic.claude-3-haiku"
+        },
+        {
+          "id": "has-bedrock-vpc-endpoint",
+          "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime",
+          "passed": true,
+          "evidence": "com.amazonaws.<region>.bedrock-runtime"
+        },
+        {
+          "id": "no-cdk-csharp-syntax-in-tf",
+          "text": "No C# / CDK syntax leaked into .tf files (e.g. 'new Vpc(', 'Construct', 'PolicyStatement')",
+          "passed": true,
+          "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"
+        },
+        {
+          "id": "backend-s3-in-versions-tf",
+          "text": "versions.tf includes a backend \"s3\" block matching repo convention",
+          "passed": true,
+          "evidence": "backend \"s3\""
+        },
+        {
+          "id": "provider-eu-central-1",
+          "text": "AWS provider region is eu-central-1 (literal or via variable/locals with the value defined)",
+          "passed": true,
+          "evidence": "region = \"eu-central-1\""
+        },
+        {
+          "id": "no-cdk-token-references-left",
+          "text": "No CFN Fn:: / Ref:: tokens or raw synth placeholders remain in the generated .tf",
+          "passed": true,
+          "evidence": "confirmed absent: \"Fn::[A-Z][a-zA-Z]+\" | confirmed absent: \\{\\s*\"Ref\"\\s*:"
+        },
+        {
+          "id": "uses-for-each-or-matches-style",
+          "text": "Generated Terraform uses conventions similar to reference service (default_tags or local.common_tags pattern)",
+          "passed": true,
+          "evidence": "default_tags"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "convert-with-vpc-import",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 12,
+        "failed": 0,
+        "total": 12,
+        "time_seconds": 629.3,
+        "tokens": 132409,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "has-new-live-config-dir",
+          "text": "A new live config directory was created under terraform-host/live/dev/",
+          "passed": true,
+          "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"
+        },
+        {
+          "id": "calls-network-module",
+          "text": "main.tf calls the existing `network` module (not raw VPC resources)",
+          "passed": true,
+          "evidence": "module \"network\" {\n  source = \"../../../modules/network\""
+        },
+        {
+          "id": "calls-alb-module",
+          "text": "main.tf calls the existing `alb` module",
+          "passed": true,
+          "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""
+        },
+        {
+          "id": "calls-ecs-service-module",
+          "text": "main.tf calls the existing `ecs-service` module",
+          "passed": true,
+          "evidence": "module \"api_service\" {\n  source = \"../../../modules/ecs-service\""
+        },
+        {
+          "id": "has-bedrock-invoke-model",
+          "text": "Generated Terraform grants bedrock:InvokeModel",
+          "passed": true,
+          "evidence": "bedrock:InvokeModel"
+        },
+        {
+          "id": "has-bedrock-invoke-stream",
+          "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream",
+          "passed": true,
+          "evidence": "bedrock:InvokeModelWithResponseStream"
+        },
+        {
+          "id": "has-bedrock-vpc-endpoint",
+          "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime",
+          "passed": true,
+          "evidence": "com.amazonaws.${data.aws_region.current.name}.bedrock-runtime"
+        },
+        {
+          "id": "has-imports-tf",
+          "text": "An imports.tf file was created in the new live config directory",
+          "passed": true,
+          "evidence": "terraform-host/live/dev/bedrock-chat/imports.tf"
+        },
+        {
+          "id": "has-vpc-import-block",
+          "text": "imports.tf contains an import block adopting the deployed VPC",
+          "passed": true,
+          "evidence": "import { | vpc-0a1b2c3d4e5f6a7b8"
+        },
+        {
+          "id": "import-to-addresses-vpc",
+          "text": "The VPC import block's `to` address references a VPC resource (module or raw)",
+          "passed": true,
+          "evidence": "to = module.network.aws_vpc.this"
+        },
+        {
+          "id": "no-duplicate-vpc-resource",
+          "text": "No raw `resource \"aws_vpc\" \"...\"` in the live config alongside the module (would conflict with import into module)",
+          "passed": true,
+          "evidence": "confirmed absent: ^\\s*resource\\s+\"aws_vpc\"\\s+\""
+        },
+        {
+          "id": "no-cdk-csharp-syntax-in-tf",
+          "text": "No C# / CDK syntax leaked into .tf files",
+          "passed": true,
+          "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "convert-with-vpc-import",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8333333333333334,
+        "passed": 10,
+        "failed": 2,
+        "total": 12,
+        "time_seconds": 406.2,
+        "tokens": 91877,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "id": "has-new-live-config-dir",
+          "text": "A new live config directory was created under terraform-host/live/dev/",
+          "passed": true,
+          "evidence": "terraform-host/live/dev/bedrock-chat/main.tf, terraform-host/live/dev/reference-service/main.tf"
+        },
+        {
+          "id": "calls-network-module",
+          "text": "main.tf calls the existing `network` module (not raw VPC resources)",
+          "passed": false,
+          "evidence": "pattern not found: module\\s+\"[^\"]*\"\\s*\\{[^}]*source\\s*=\\s*\"[^\"]*modules/network\""
+        },
+        {
+          "id": "calls-alb-module",
+          "text": "main.tf calls the existing `alb` module",
+          "passed": true,
+          "evidence": "module \"alb\" {\n  source = \"../../../modules/alb\""
+        },
+        {
+          "id": "calls-ecs-service-module",
+          "text": "main.tf calls the existing `ecs-service` module",
+          "passed": true,
+          "evidence": "module \"api_service\" {\n  source = \"../../../modules/ecs-service\""
+        },
+        {
+          "id": "has-bedrock-invoke-model",
+          "text": "Generated Terraform grants bedrock:InvokeModel",
+          "passed": true,
+          "evidence": "bedrock:InvokeModel"
+        },
+        {
+          "id": "has-bedrock-invoke-stream",
+          "text": "Generated Terraform grants bedrock:InvokeModelWithResponseStream",
+          "passed": true,
+          "evidence": "bedrock:InvokeModelWithResponseStream"
+        },
+        {
+          "id": "has-bedrock-vpc-endpoint",
+          "text": "Generated Terraform creates a VPC interface endpoint for bedrock-runtime",
+          "passed": true,
+          "evidence": "com.amazonaws.${data.aws_region.current.name}.bedrock-runtime"
+        },
+        {
+          "id": "has-imports-tf",
+          "text": "An imports.tf file was created in the new live config directory",
+          "passed": true,
+          "evidence": "terraform-host/live/dev/bedrock-chat/imports.tf"
+        },
+        {
+          "id": "has-vpc-import-block",
+          "text": "imports.tf contains an import block adopting the deployed VPC",
+          "passed": true,
+          "evidence": "import { | vpc-0a1b2c3d4e5f6a7b8"
+        },
+        {
+          "id": "import-to-addresses-vpc",
+          "text": "The VPC import block's `to` address references a VPC resource (module or raw)",
+          "passed": true,
+          "evidence": "to = module.network.aws_vpc.this"
+        },
+        {
+          "id": "no-duplicate-vpc-resource",
+          "text": "No raw `resource \"aws_vpc\" \"...\"` in the live config alongside the module (would conflict with import into module)",
+          "passed": false,
+          "evidence": "unwanted pattern found: resource \"aws_vpc\" \""
+        },
+        {
+          "id": "no-cdk-csharp-syntax-in-tf",
+          "text": "No C# / CDK syntax leaked into .tf files",
+          "passed": true,
+          "evidence": "confirmed absent: \\bnew\\s+Vpc\\s*\\( | confirmed absent: \\bConstruct\\b(?!\\w) | confirmed absent: \\bPolicyStatement\\b | confirmed absent: \\bAmazon\\.CDK"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.9792,
+        "stddev": 0.0361,
+        "min": 0.9375,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 487.8667,
+        "stddev": 169.0063,
+        "min": 300.7,
+        "max": 629.3
+      },
+      "tokens": {
+        "mean": 111162.6667,
+        "stddev": 30897.603,
+        "min": 75718,
+        "max": 132409
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.9236,
+        "stddev": 0.0842,
+        "min": 0.8333,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 358.9,
+        "stddev": 79.3421,
+        "min": 267.3,
+        "max": 406.2
+      },
+      "tokens": {
+        "mean": 79497.3333,
+        "stddev": 17926.7166,
+        "min": 58940,
+        "max": 91877
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.0556",
+      "time_seconds": "+129.0",
+      "tokens": "+31665"
+    }
+  },
+  "notes": [
+    "Eval 1: with_skill wins on 1 assertion(s): module-inventory.md documents Inputs and Outputs (or equivalent) for modules",
+    "Eval 1: baseline wins on 1 assertion(s) \u2014 worth investigating: repo-conventions.md mentions the default region (eu-central-1)",
+    "Eval 3: with_skill wins on 2 assertion(s): main.tf calls the existing `network` module (not raw VPC resources), No raw `resource \"aws_vpc\" \"...\"` in the live config alongside the module (would",
+    "Time: with_skill avg 487.9s vs baseline avg 358.9s (\u0394 +129.0s).",
+    "Tokens: with_skill avg 111163 vs baseline avg 79497 (\u0394 +31665)."
+  ]
+}
