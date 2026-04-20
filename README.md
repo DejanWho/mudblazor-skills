@@ -1,6 +1,8 @@
-# mudblazor-skills
+# Agent Skills for Claude Code & GitHub Copilot
 
-A collection of Claude agent skills — plus matching GitHub Copilot custom agents where applicable — for common developer workflows. The repo originally shipped a pair of MudBlazor 9 skills, hence the name; it now covers other workflows too (AWS CDK → Terraform conversion). The build + benchmark tooling under `scripts/` is shared across all of them.
+A collection of Claude agent skills — plus matching GitHub Copilot custom agents where applicable — for common developer workflows. The build + benchmark tooling under `scripts/` is shared across all of them.
+
+> **On the repo name:** the directory / slug `mudblazor-skills` is legacy — the repo originally shipped a pair of MudBlazor 9 skills. It now covers unrelated workflows too (AWS CDK → Terraform). The slug is kept to avoid breaking external links.
 
 ## Skills in this repo
 
